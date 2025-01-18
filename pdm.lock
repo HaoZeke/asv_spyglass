@@ -5,37 +5,31 @@
 groups = ["default"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:694295899611778d6e1bb74a5cbe4b8d3fab13151ef44198fbed1c2644e0b48c"
+content_hash = "sha256:e2304c2b4527b2cefe20c0c8a76b23d9960e6d678b92a7e25c32b2e863d5ff24"
 
 [[metadata.targets]]
 requires_python = ">=3.12"
 
 [[package]]
 name = "asv"
-version = "0.6.4"
+version = "0.6.5.dev73"
 requires_python = ">=3.7"
+git = "https://github.com/airspeed-velocity/asv/"
+revision = "4c31edaaf82fecb28db3f93af8cfa62d6ab50fd1"
 summary = "Airspeed Velocity: A simple Python history benchmarking tool"
 groups = ["default"]
 dependencies = [
     "asv-runner>=v0.2.1",
     "build",
     "colorama; platform_system == \"Windows\"",
+    "importlib-metadata",
     "json5",
+    "packaging",
     "pympler; platform_python_implementation != \"PyPy\"",
     "pyyaml; platform_python_implementation != \"PyPy\"",
     "tabulate",
     "tomli; python_version < \"3.11\"",
     "virtualenv",
-]
-files = [
-    {file = "asv-0.6.4-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:244b71778f91aa6672e1f16feb9eecac78ef7cee95228ef8f0315a2e2deecfed"},
-    {file = "asv-0.6.4-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:3e798b275de2889748d43d42305bfce68c015a3e38ae935d231835cb836fef73"},
-    {file = "asv-0.6.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d064c5ac1ab18efc62467f65ed4989a2e2ac1a4d21886119fa0ef0f91d548438"},
-    {file = "asv-0.6.4-cp312-cp312-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:c51e5862bdac0f1fe11886bdd40b30a9691a65cb7feac40f0676fe9206d5bb43"},
-    {file = "asv-0.6.4-cp312-cp312-musllinux_1_1_i686.whl", hash = "sha256:46a7ca838e8c49109c43b1cda0eb64abc5e0a045538da718abe981d115ed47aa"},
-    {file = "asv-0.6.4-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:f5f722178c7e36b797f764c837fc03c462f68c8f2cba5145b2e64119e46231ff"},
-    {file = "asv-0.6.4-cp312-cp312-win_amd64.whl", hash = "sha256:f972ca71316d46a0242eb69e53dadfeab1e4d0546773b0f722462f97b3e5fbd9"},
-    {file = "asv-0.6.4.tar.gz", hash = "sha256:1d124184171cfe106e3e57ac04e3221b8d4571c9bd6ca2c6498a8c7407339df1"},
 ]
 
 [[package]]
