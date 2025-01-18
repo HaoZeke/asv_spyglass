@@ -1,0 +1,13 @@
+[project]
+authors = ["Rohit Goswami <rgoswami@ieee.org>"]
+channels = ["conda-forge"]
+description = "File oriented ASV benchmark comparer"
+name = "asv_spyglass"
+platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "==3.12"
+pdm = ">=2.22.2,<3"
