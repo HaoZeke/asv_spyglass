@@ -9,7 +9,13 @@ dependencies = ["asv>=0.6.4", "click>=8.1.8", "asv-runner>=0.2.1"]
 requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "MIT"}
-
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: System :: Benchmark",
+]
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
@@ -17,3 +23,6 @@ build-backend = "pdm.backend"
 
 [tool.pdm]
 distribution = true
+
+[project.scripts]
+asv-spyglass = "asv_spyglass.cli:cli"
