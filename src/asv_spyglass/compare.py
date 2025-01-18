@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from pathlib import Path
 import math
 
@@ -12,7 +10,9 @@ from asv.console import log
 from asv.util import human_value
 from asv import _stats
 from asv.commands.compare import _is_result_better, unroll_result, _isna
-import asv
+from asv.config import Config as ASVConf
+from asv.benchmarks import Benchmarks as ASVBenchmarks
+
 
 def result_iter(bdot):
     for key in bdot.get_all_result_keys():
@@ -48,9 +48,9 @@ def do_compare(
     # Already validated by click normally
     res_1 = results.Results.load(b1)
     res_2 = results.Results.load(b2)
-    conf_asv = asv.config.Config()
+    conf_asv = ASVConf()
     conf_asv.results_dir = Path(bconf).parent
-    benchmarks = asv.benchmarks.Benchmarks.load(conf_asv)
+    benchmarks = ASVBenchmarks.load(conf_asv)
     # Kanged from compare.py
 
     results_1 = {}
