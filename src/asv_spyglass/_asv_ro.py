@@ -2,7 +2,7 @@ import json
 import pprint as pp
 import re
 from pathlib import Path
-from typing import Dict, Iterator, List, Union
+from typing import Iterator, Union
 
 from asv.util import load_json as asv_json_load
 
@@ -14,24 +14,24 @@ class ReadOnlyASVBenchmarks:
 
     api_version = 2
 
-    def __init__(self, benchmarks_file: Path, regex: Union[str, List[str]] = None):
+    def __init__(self, benchmarks_file: Path, regex: Union[str, list[str]] = None):
         """
         Initialize and load benchmarks from a JSON file, optionally filtering them.
 
         Args:
             benchmarks_file (Path): Path to the benchmarks JSON file.
-            regex (Union[str, List[str]], optional): Regular expression(s) to filter benchmarks.
+            regex (Union[str, list[str]], optional): Regular expression(s) to filter benchmarks.
                 Defaults to None (all benchmarks included).
         """
         d = asv_json_load(getstrform(benchmarks_file), api_version=self.api_version)
         self._benchmarks = d.values()
         self._filtered_benchmarks = self._filter_benchmarks(regex)
 
-    def __iter__(self) -> Iterator[Dict]:
+    def __iter__(self) -> Iterator[dict]:
         """Iterate over the filtered benchmarks."""
         return iter(self._filtered_benchmarks.values())
 
-    def __getitem__(self, name: str) -> Union[Dict, None]:
+    def __getitem__(self, name: str) -> Union[dict, None]:
         """Get a benchmark by name."""
         return self._filtered_benchmarks.get(name)
 
@@ -39,27 +39,27 @@ class ReadOnlyASVBenchmarks:
         return pp.pformat(self._filtered_benchmarks)
 
     @property
-    def benchmark_names(self) -> List[str]:
+    def benchmark_names(self) -> list[str]:
         """Get a list of benchmark names."""
         return list(self._filtered_benchmarks.keys())
 
     @property
-    def benchmarks(self) -> List[str]:
+    def benchmarks(self) -> list[str]:
         """Get a list of benchmark names."""
         return self._filtered_benchmarks
 
     def _filter_benchmarks(
-        self, regex: Union[str, List[str]] = None
-    ) -> Dict[str, Dict]:
+        self, regex: Union[str, list[str]] = None
+    ) -> dict[str, dict]:
         """
         Filter benchmarks based on provided regular expression(s).
 
         Args:
-            regex (Union[str, List[str]], optional): Regular expression(s) to filter benchmarks.
+            regex (Union[str, list[str]], optional): Regular expression(s) to filter benchmarks.
                 Defaults to None (all benchmarks included).
 
         Returns:
-            Dict[str, Dict]: A dictionary containing filtered benchmarks.
+            dict[str, dict]: A dictionary containing filtered benchmarks.
         """
         if not regex:
             return {benchmark["name"]: benchmark for benchmark in self._benchmarks}
