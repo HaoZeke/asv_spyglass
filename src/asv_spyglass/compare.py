@@ -261,7 +261,8 @@ def do_compare(
         else:
             raise ValueError("Unknown 'sort'")
 
-        print(
+        print(worsened, improved)
+        return(
             tabulate.tabulate(
                 bench[key],
                 headers=[
@@ -274,4 +275,3 @@ def do_compare(
                 tablefmt="github",
             )
         )
-        print(worsened, improved)
