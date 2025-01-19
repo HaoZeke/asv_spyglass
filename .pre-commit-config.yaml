@@ -8,17 +8,18 @@ repos:
         exclude: ^(test/example_results/cheetah)
     -   id: check-yaml
     -   id: check-added-large-files
--   repo: https://github.com/pycqa/isort
-    rev: 5.12.0
-    hooks:
-    -   id: isort
-        name: isort (python)
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.272
+    rev: v0.9.2
     hooks:
-    -   id: ruff
-        args: ["--fix", "--show-source"]
+    -   id: ruff # Linter
+        name: ruff-lint
+        args: ["--fix", "--show-files"]
+    -   id: ruff # isort replacement
+        name: ruff-isort
+        args: ["--select", "I", "--fix"]
+    - id: ruff-format # Format
+      name: ruff-lint
 - repo: https://github.com/pdm-project/pdm
-  rev: 2.x.y # a PDM release exposing the hook
+  rev: 2.22.2
   hooks:
     - id: pdm-lock-check
