@@ -14,6 +14,15 @@ Conduct](https://github.com/airspeed-velocity/asv_spyglass/blob/main/CODE_OF_CON
 
 ## Developing locally
 
+### Testing
+
+Since the output of these are mostly text oriented, and the inputs are `json`,
+these are handled via a mixture of reading known data and using golden master
+testing aka approval testing. Thus `pytest` with `pytest-datadir` and
+`ApprovalTests.Python` is used.
+
+### Linting and Formatting
+
 A `pre-commit` job is setup on CI to enforce consistent styles, so it is best to
 set it up locally as well (using [pipx](https://pypa.github.io/pipx/) for isolation):
 
