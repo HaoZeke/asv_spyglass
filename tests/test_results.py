@@ -1,15 +1,10 @@
 import pprint as pp
-from pathlib import Path
 
 from approvaltests.approvals import verify
 from asv import results
 
 from asv_spyglass.compare import do_compare, result_iter
-
-
-# Kanged from rgpycrumbs
-def getstrform(pathobj):
-    return str(pathobj.absolute())
+from asv_spyglass._aux import getstrform
 
 
 def test_result_iter(shared_datadir):
@@ -20,8 +15,10 @@ def test_result_iter(shared_datadir):
 
 
 def test_do_compare(shared_datadir):
-    verify(do_compare(
-        getstrform(shared_datadir / "a0f29428-conda-py3.11-numpy.json"),
-        getstrform(shared_datadir / "a0f29428-virtualenv-py3.12-numpy.json"),
-        getstrform(shared_datadir / "benchmarks.json"),
-    ))
+    verify(
+        do_compare(
+            getstrform(shared_datadir / "a0f29428-conda-py3.11-numpy.json"),
+            getstrform(shared_datadir / "a0f29428-virtualenv-py3.12-numpy.json"),
+            shared_datadir / "asv_samples_a0f29428_benchmarks.json",
+        )
+    )
