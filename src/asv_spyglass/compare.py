@@ -3,13 +3,13 @@ from pathlib import Path
 
 import tabulate
 from asv import results
-from asv.benchmarks import Benchmarks as ASVBenchmarks
 from asv.commands.compare import _is_result_better, _isna, unroll_result
-from asv.config import Config as ASVConf
 from asv.console import log
 from asv.util import human_value
 from asv_runner.console import color_print
 from asv_runner.statistics import get_err
+
+from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
 
 
 def result_iter(bdot):
@@ -34,7 +34,7 @@ def result_iter(bdot):
 def do_compare(
     b1,
     b2,
-    bconf,
+    bdat,
     factor=1.1,
     split=False,
     only_changed=False,
@@ -46,9 +46,8 @@ def do_compare(
     # Already validated by click normally
     res_1 = results.Results.load(b1)
     res_2 = results.Results.load(b2)
-    conf_asv = ASVConf()
-    conf_asv.results_dir = Path(bconf).parent
-    benchmarks = ASVBenchmarks.load(conf_asv)
+    # TODO: Add the regex later
+    benchmarks = ReadOnlyASVBenchmarks(bdat).benchmarks
     # Kanged from compare.py
 
     results_1 = {}
@@ -262,16 +261,14 @@ def do_compare(
             raise ValueError("Unknown 'sort'")
 
         print(worsened, improved)
-        return(
-            tabulate.tabulate(
-                bench[key],
-                headers=[
-                    "Change",
-                    f"Before {name_1}",
-                    f"After {name_2}",
-                    "Ratio",
-                    "Benchmark (Parameter)",
-                ],
-                tablefmt="github",
-            )
+        return tabulate.tabulate(
+            bench[key],
+            headers=[
+                "Change",
+                f"Before {name_1}",
+                f"After {name_2}",
+                "Ratio",
+                "Benchmark (Parameter)",
+            ],
+            tablefmt="github",
         )

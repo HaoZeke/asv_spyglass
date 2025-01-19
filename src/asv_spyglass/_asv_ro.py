@@ -22,9 +22,6 @@ class ReadOnlyASVBenchmarks:
             benchmarks_file (Path): Path to the benchmarks JSON file.
             regex (Union[str, List[str]], optional): Regular expression(s) to filter benchmarks.
                 Defaults to None (all benchmarks included).
-
-        Raises:
-            UserError: If the benchmarks file is missing or invalid.
         """
         d = asv_json_load(getstrform(benchmarks_file), api_version=self.api_version)
         self._benchmarks = d.values()
@@ -45,6 +42,11 @@ class ReadOnlyASVBenchmarks:
     def benchmark_names(self) -> List[str]:
         """Get a list of benchmark names."""
         return list(self._filtered_benchmarks.keys())
+
+    @property
+    def benchmarks(self) -> List[str]:
+        """Get a list of benchmark names."""
+        return self._filtered_benchmarks
 
     def _filter_benchmarks(
         self, regex: Union[str, List[str]] = None
