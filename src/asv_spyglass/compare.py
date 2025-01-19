@@ -10,6 +10,16 @@ from asv_runner.console import color_print
 from asv_runner.statistics import get_err
 
 from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
+from dataclasses import dataclass
+
+
+@dataclass
+class PreparedResult:
+    units: dict
+    results: dict
+    stats: dict
+    versions: dict
+    machine_env_name: str
 
 
 def result_iter(bdot):
@@ -31,6 +41,65 @@ def result_iter(bdot):
         )
 
 
+class ResultPreparer:
+    """
+    Prepares benchmark results for comparison by extracting relevant data
+    like units, values, stats, versions, and machine/environment names.
+    """
+
+    def __init__(self, benchmarks):
+        """
+        Initializes ResultPreparer with benchmark data.
+
+        Args:
+            benchmarks: Benchmark data used for extracting units.
+        """
+        self.benchmarks = benchmarks
+
+    def prepare(self, result_data):
+        """
+        Processes result data and returns extracted information.
+
+        Args:
+            result_data: Result data to be processed.
+
+        Returns:
+            tuple: A tuple containing units, results, stats, versions,
+                   and the machine/environment name.
+        """
+        units = {}
+        results = {}
+        ss = {}
+        versions = {}
+
+        for (
+            key,
+            params,
+            value,
+            stats,
+            samples,
+            version,
+            machine,
+            env_name,
+        ) in result_iter(result_data):
+            machine_env_name = f"{machine}/{env_name}"
+            for name, value, stats, samples in unroll_result(
+                key, params, value, stats, samples
+            ):
+                units[name] = self.benchmarks.get(key, {}).get("unit")
+                results[name] = value
+                ss[name] = (stats, samples)
+                versions[name] = version
+
+        return PreparedResult(
+            units=units,
+            results=results,
+            stats=ss,
+            versions=versions,
+            machine_env_name=machine_env_name,
+        )
+
+
 def do_compare(
     b1,
     b2,
@@ -43,48 +112,31 @@ def do_compare(
     env_spec=None,
     use_stats=True,
 ):
-    # Already validated by click normally
+    # Load results
     res_1 = results.Results.load(b1)
     res_2 = results.Results.load(b2)
-    # TODO: Add the regex later
-    benchmarks = ReadOnlyASVBenchmarks(bdat).benchmarks
+
+    # Initialize benchmarks
+    benchmarks = ReadOnlyASVBenchmarks(Path(bdat)).benchmarks
+
+    # Prepare results using the ResultPreparer class
+    preparer = ResultPreparer(benchmarks)
+    prepared_results_1 = preparer.prepare(res_1)
+    prepared_results_2 = preparer.prepare(res_2)
     # Kanged from compare.py
 
-    results_1 = {}
-    results_2 = {}
-    ss_1 = {}
-    ss_2 = {}
-    versions_1 = {}
-    versions_2 = {}
-    units = {}
+    # Extract data from prepared results
+    results_1 = prepared_results_1.results
+    results_2 = prepared_results_2.results
+    ss_1 = prepared_results_1.stats
+    ss_2 = prepared_results_2.stats
+    versions_1 = prepared_results_1.versions
+    versions_2 = prepared_results_2.versions
+    units = prepared_results_1.units
 
     machine_env_names = set()
-
-    for key, params, value, stats, samples, version, machine, env_name in result_iter(
-        res_1
-    ):
-        machine_env_name = f"{machine}/{env_name}"
-        machine_env_names.add(machine_env_name)
-        for name, value, stats, samples in unroll_result(
-            key, params, value, stats, samples
-        ):
-            units[name] = benchmarks.get(key, {}).get("unit")
-            results_1[name] = value
-            ss_1[name] = (stats, samples)
-            versions_1[name] = version
-
-    for key, params, value, stats, samples, version, machine, env_name in result_iter(
-        res_2
-    ):
-        machine_env_name = f"{machine}/{env_name}"
-        machine_env_names.add(machine_env_name)
-        for name, value, stats, samples in unroll_result(
-            key, params, value, stats, samples
-        ):
-            units[name] = benchmarks.get(key, {}).get("unit")
-            results_2[name] = value
-            ss_2[name] = (stats, samples)
-            versions_2[name] = version
+    machine_env_names.add(prepared_results_1.machine_env_name)
+    machine_env_names.add(prepared_results_2.machine_env_name)
 
     benchmarks_1 = set(results_1.keys())
     benchmarks_2 = set(results_2.keys())
