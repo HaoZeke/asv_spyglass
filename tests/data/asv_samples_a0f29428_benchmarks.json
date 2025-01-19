@@ -1,0 +1,18 @@
+{
+    "benchmarks.TimeSuite.time_add_arr": {
+        "code": "class TimeSuite:\n    def time_add_arr(self):\n        \"\"\"\n        Time the add_arr function with two lists of numbers.\n        \"\"\"\n        add_arr(self.list1, self.list2)\n\n    def setup(self):\n        self.list1 = [i for i in range(500)]\n        self.list2 = [i for i in range(500, 1000)]",
+        "min_run_count": 2,
+        "name": "benchmarks.TimeSuite.time_add_arr",
+        "number": 0,
+        "param_names": [],
+        "params": [],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "type": "time",
+        "unit": "seconds",
+        "version": "a7119d8d28c9accb9643fb287a1f26775e9d1bcddcd76213aca1b56822c89f0c",
+        "warmup_time": -1
+    },
+    "version": 2
+}
