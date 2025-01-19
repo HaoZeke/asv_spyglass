@@ -1,9 +1,9 @@
+import pprint as pp
 from pathlib import Path
 
 from approvaltests.approvals import verify
-import pprint as pp
-
 from asv import results
+
 from asv_spyglass.compare import result_iter
 
 
