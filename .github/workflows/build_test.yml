@@ -16,9 +16,18 @@ jobs:
           cache: true
           cache-write: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
 
-      - name: Test and build
+      - name: Install dependencies
         shell: pixi run bash -e {0}
         run: |
           pdm install -G:all
+
+      - name: Test package
+        shell: pixi run bash -e {0}
+        run: |
           pdm run pytest
+          pdm build
+
+      - name: Build package
+        shell: pixi run bash -e {0}
+        run: |
           pdm build
