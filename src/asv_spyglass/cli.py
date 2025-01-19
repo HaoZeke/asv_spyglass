@@ -1,5 +1,7 @@
 import click
+
 from asv_spyglass.compare import do_compare
+
 
 @click.command()
 @click.argument("b1", type=click.Path(exists=True), required=True)
@@ -33,6 +35,3 @@ def cli(b1, b2, bconf, factor, split, only_changed, sort):
     Compare two ASV result files.
     """
     do_compare(b1, b2, bconf, factor, split, only_changed, sort)
-
-if __name__ == "__main__":
-    cli()

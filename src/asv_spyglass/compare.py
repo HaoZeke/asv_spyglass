@@ -1,17 +1,15 @@
-from pathlib import Path
 import math
+from pathlib import Path
 
 import tabulate
-from asv_runner.console import color_print
-from asv_runner.statistics import get_err
-
 from asv import results
+from asv.benchmarks import Benchmarks as ASVBenchmarks
+from asv.commands.compare import _is_result_better, _isna, unroll_result
+from asv.config import Config as ASVConf
 from asv.console import log
 from asv.util import human_value
-from asv import _stats
-from asv.commands.compare import _is_result_better, unroll_result, _isna
-from asv.config import Config as ASVConf
-from asv.benchmarks import Benchmarks as ASVBenchmarks
+from asv_runner.console import color_print
+from asv_runner.statistics import get_err
 
 
 def result_iter(bdot):
@@ -234,7 +232,6 @@ def do_compare(
     log.flush()
 
     for key in keys:
-
         if len(bench[key]) == 0:
             continue
 
@@ -277,3 +274,4 @@ def do_compare(
                 tablefmt="github",
             )
         )
+        print(worsened, improved)
