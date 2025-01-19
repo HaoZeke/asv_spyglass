@@ -2,23 +2,19 @@ import pprint as pp
 from pathlib import Path
 
 from approvaltests.approvals import verify
-from asv.benchmarks import Benchmarks as ASVBenchmarks
-from asv.config import Config as ASVConf
+
+from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
 
 
 def test_ro_benchmarks(shared_datadir):
-    conf_asv = ASVConf()
-    conf_asv.results_dir = Path(
-        shared_datadir / "asv_samples_a0f29428_benchmarks.json",
-    ).parent
-    benchmarks = ASVBenchmarks.load(conf_asv)
+    benchmarks = ReadOnlyASVBenchmarks(
+        shared_datadir / "d6b286b8_asv_samples_benchmarks.json"
+    )
     verify(pp.pformat(benchmarks))
 
 
 def test_ro_benchmarks_filter(shared_datadir):
-    conf_asv = ASVConf()
-    conf_asv.results_dir = Path(
-        shared_datadir / "asv_samples_a0f29428_benchmarks.json",
-    ).parent
-    benchmarks = ASVBenchmarks.load(conf_asv, "multi")
+    benchmarks = ReadOnlyASVBenchmarks(
+        shared_datadir / "d6b286b8_asv_samples_benchmarks.json", "multi"
+    )
     verify(pp.pformat(benchmarks))
