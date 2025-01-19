@@ -1,0 +1,125 @@
+{
+    "benchmarks.TimeSuiteDecoratorSingle.time_keys": {
+        "code": "class TimeSuiteDecoratorSingle:\n    def time_keys(self, size):\n        for key in self.d.keys():\n            pass\n\n    def setup(self, size):\n        self.d = {}\n        for x in range(size):\n            self.d[x] = None",
+        "min_run_count": 2,
+        "name": "benchmarks.TimeSuiteDecoratorSingle.time_keys",
+        "number": 0,
+        "param_names": [
+            "size"
+        ],
+        "params": [
+            [
+                "10",
+                "100",
+                "200"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "type": "time",
+        "unit": "seconds",
+        "version": "64746c9051ff76aa879b428c27b4247e8ed976c44a40579ae9aa4601b9883ed5",
+        "warmup_time": -1
+    },
+    "benchmarks.TimeSuiteDecoratorSingle.time_values": {
+        "code": "class TimeSuiteDecoratorSingle:\n    def time_values(self, size):\n        for value in self.d.values():\n            pass\n\n    def setup(self, size):\n        self.d = {}\n        for x in range(size):\n            self.d[x] = None",
+        "min_run_count": 2,
+        "name": "benchmarks.TimeSuiteDecoratorSingle.time_values",
+        "number": 0,
+        "param_names": [
+            "size"
+        ],
+        "params": [
+            [
+                "10",
+                "100",
+                "200"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "type": "time",
+        "unit": "seconds",
+        "version": "ab162b6142a1390a0e2a667ed8d2d3285f77152d9caa559b4fd784bb120aa153",
+        "warmup_time": -1
+    },
+    "benchmarks.TimeSuiteMultiDecorator.time_ranges": {
+        "code": "class TimeSuiteMultiDecorator:\n    def time_ranges(self, n, func_name):\n        f = {'range': range, 'arange': np.arange}[func_name]\n        for i in f(n):\n            pass",
+        "min_run_count": 2,
+        "name": "benchmarks.TimeSuiteMultiDecorator.time_ranges",
+        "number": 0,
+        "param_names": [
+            "n",
+            "func_name"
+        ],
+        "params": [
+            [
+                "10",
+                "100"
+            ],
+            [
+                "'range'",
+                "'arange'"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "type": "time",
+        "unit": "seconds",
+        "version": "bf8381bfa42fb47f084462e83ab870e9779fb25535168f77415db72845b02f6d",
+        "warmup_time": -1
+    },
+    "benchmarks.time_ranges_multi": {
+        "code": "@parameterize({'n': [10, 100], 'func_name': ['range', 'arange']})\ndef time_ranges_multi(n, func_name):\n    f = {'range': range, 'arange': np.arange}[func_name]\n    for i in f(n):\n        pass",
+        "min_run_count": 2,
+        "name": "benchmarks.time_ranges_multi",
+        "number": 0,
+        "param_names": [
+            "n",
+            "func_name"
+        ],
+        "params": [
+            [
+                "10",
+                "100"
+            ],
+            [
+                "'range'",
+                "'arange'"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "type": "time",
+        "unit": "seconds",
+        "version": "f9ae8b134446c273c0d3eb1e90246ae0d6f99389d06119dfe4fed7210eccdb15",
+        "warmup_time": -1
+    },
+    "benchmarks.time_sort": {
+        "code": "@parameterize({\"n\":[10, 100]})\ndef time_sort(n):\n    np.sort(np.random.rand(n))",
+        "min_run_count": 2,
+        "name": "benchmarks.time_sort",
+        "number": 0,
+        "param_names": [
+            "n"
+        ],
+        "params": [
+            [
+                "10",
+                "100"
+            ]
+        ],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "type": "time",
+        "unit": "seconds",
+        "version": "60785bf757da0254d857b696482db7a25509a5b28a2c9d2a54e85d2a593ce272",
+        "warmup_time": -1
+    },
+    "version": 2
+}

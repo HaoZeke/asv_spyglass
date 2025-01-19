@@ -3,8 +3,8 @@ import pprint as pp
 from approvaltests.approvals import verify
 from asv import results
 
-from asv_spyglass.compare import do_compare, result_iter
 from asv_spyglass._aux import getstrform
+from asv_spyglass.compare import do_compare, result_iter
 
 
 def test_result_iter(shared_datadir):

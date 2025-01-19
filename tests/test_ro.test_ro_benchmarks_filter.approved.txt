@@ -1,0 +1,21 @@
+{'benchmarks.time_ranges_multi': {'code': "@parameterize({'n': [10, 100], "
+                                          "'func_name': ['range', 'arange']})\n"
+                                          'def time_ranges_multi(n, '
+                                          'func_name):\n'
+                                          "    f = {'range': range, 'arange': "
+                                          'np.arange}[func_name]\n'
+                                          '    for i in f(n):\n'
+                                          '        pass',
+                                  'min_run_count': 2,
+                                  'name': 'benchmarks.time_ranges_multi',
+                                  'number': 0,
+                                  'param_names': ['n', 'func_name'],
+                                  'params': [['10', '100'],
+                                             ["'range'", "'arange'"]],
+                                  'repeat': 0,
+                                  'rounds': 2,
+                                  'sample_time': 0.01,
+                                  'type': 'time',
+                                  'unit': 'seconds',
+                                  'version': 'f9ae8b134446c273c0d3eb1e90246ae0d6f99389d06119dfe4fed7210eccdb15',
+                                  'warmup_time': -1}}
