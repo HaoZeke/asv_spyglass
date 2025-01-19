@@ -34,4 +34,4 @@ def cli(b1, b2, bconf, factor, split, only_changed, sort):
     """
     Compare two ASV result files.
     """
-    do_compare(b1, b2, bconf, factor, split, only_changed, sort)
+    print(do_compare(b1, b2, bconf, factor, split, only_changed, sort))
