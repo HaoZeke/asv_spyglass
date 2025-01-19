@@ -1,0 +1,13 @@
+[('benchmarks.TimeSuite.time_add_arr',
+  [],
+  [9.483513206484194e-05],
+  [{'ci_99_a': 6.1389e-05,
+    'ci_99_b': 0.00013045,
+    'number': 178,
+    'q_25': 6.2319e-05,
+    'q_75': 0.00012683,
+    'repeat': 10}],
+  [None],
+  'a7119d8d28c9accb9643fb287a1f26775e9d1bcddcd76213aca1b56822c89f0c',
+  'rgx1gen11',
+  'conda-py3.11-numpy')]
