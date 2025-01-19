@@ -1,4 +1,7 @@
 import math
+import dataclasses
+import pandas as pd
+import re
 from pathlib import Path
 
 import tabulate
@@ -10,16 +13,54 @@ from asv_runner.console import color_print
 from asv_runner.statistics import get_err
 
 from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
-from dataclasses import dataclass
 
 
-@dataclass
+@dataclasses.dataclass
 class PreparedResult:
     units: dict
     results: dict
     stats: dict
     versions: dict
     machine_env_name: str
+
+    def __iter__(self):
+        for field in dataclasses.fields(self):
+            yield getattr(self, field.name)
+
+
+def prepared_result_to_dataframe(prepared_result):
+    """
+    Converts a PreparedResult object to a Pandas DataFrame,
+    exploding the parameters in the keys and flattening the results.
+    """
+
+    data = []
+    for key, result in prepared_result.results.items():
+        # Extract benchmark name and parameters
+        match = re.match(r"(.+)\((.*)\)", key)
+        if match:
+            benchmark_name = match.group(1)
+            params = match.group(2).split(", ")
+        else:
+            benchmark_name = key
+            params = []
+
+        # Flatten the results tuple
+        stats_dict, samples = prepared_result.stats[key]
+
+        row = {
+            "benchmark_name": benchmark_name,
+            "result": result,
+            "units": prepared_result.units[key],
+            "machine_env_name": prepared_result.machine_env_name,
+            "version": prepared_result.versions[key],
+            **stats_dict,  # Expand the stats dictionary
+            "samples": samples,
+        }
+        row.update(dict(zip(["param_" + str(i) for i in range(len(params))], params)))
+        data.append(row)
+
+    return pd.DataFrame(data)
 
 
 def result_iter(bdot):
@@ -86,10 +127,16 @@ class ResultPreparer:
             for name, value, stats, samples in unroll_result(
                 key, params, value, stats, samples
             ):
-                units[name] = self.benchmarks.get(key, {}).get("unit")
+                # HACK(hz): The names already include the parameters i.e.
+                # benchmark(param) so this works around the situation
+                bench_key = [x for x in self.benchmarks.keys() if key in x][0]
+                units[name] = self.benchmarks.get(bench_key, {}).get("unit")
                 results[name] = value
+                # TODO(hz): Split samples out later when _is_result_better is
+                # not used anymore, currently in a tuple for ASV compatibility
                 ss[name] = (stats, samples)
                 versions[name] = version
+                breakpoint()
 
         return PreparedResult(
             units=units,
@@ -256,9 +303,9 @@ def do_compare(
         )
         split_line = details.split()
         if len(machine_env_names) > 1:
-            benchmark_name = "{} [{}]".format(*benchmark)
+            benchmark_name = "{} [{}]".format(benchmark, machine_env_names)
         else:
-            benchmark_name = benchmark[0]
+            benchmark_name = benchmark
         if len(split_line) == 4:
             split_line += [benchmark_name]
         else:
@@ -312,6 +359,7 @@ def do_compare(
         else:
             raise ValueError("Unknown 'sort'")
 
+        breakpoint()
         print(worsened, improved)
         return tabulate.tabulate(
             bench[key],
