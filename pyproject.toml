@@ -33,3 +33,18 @@ distribution = true
 
 [project.scripts]
 asv-spyglass = "asv_spyglass.cli:cli"
+
+[tool.ruff]
+line-length = 88
+extend-include = ["tests/**/*.py"]
+
+[tool.ruff.lint]
+extend-ignore = [
+    "E741", # Do not use variables named "I", "O", or "l"
+]
+select = [
+  "E",   # pycodestyle
+  "F",   # pyflakes
+  "UP",  # pyupgrade
+  "I",   # sort
+]
