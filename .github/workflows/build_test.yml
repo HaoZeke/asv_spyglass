@@ -19,5 +19,6 @@ jobs:
       - name: Test and build
         shell: pixi run bash -e {0}
         run: |
+          pdm install -G:all
           pdm run pytest
           pdm build
