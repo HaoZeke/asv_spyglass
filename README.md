@@ -7,7 +7,7 @@ extension.
 
 ## Basic usage
 
-### Comparing two benchmarks
+### Comparing two benchmark results
 
 This is agnostic to the environment, however the `benchmarks.json` is required.
 The practical usage of this command is to compare `asv` runs from builds which
@@ -70,6 +70,87 @@ shape: (16, 17)
 |                                |                                |           |         |           |                      | 7a25509a5b28a2c9d2a54...      |           |           |           |           |        |        |         |            |         |                 |
 ```
 
+
+## Advanced usage
+
+### Benchmarking across arbitrary environments
+
+Consider the following situation:
+
+``` sh
+pixi shell & pdm install -G:all # To start with the right setup for asv_spyglass
+# Somewhere else..
+gh repo clone airspeed-velocity/asv_samples
+cd asv_samples
+git checkout decorator-params
+# Generate the config
+python scripts/gen_asv_conf.py asv.conf.base.json
+```
+
+Now assuming there are two environments which are present, and both have the
+project to be tested installed. For this we will use `micromamba`.
+
+``` sh
+micromamba create -p $(pwd)/.tmp_1 -c conda-forge "python==3.8" pip asv numpy
+$(pwd)/.tmp_1/bin/pip install .
+micromamba create -p $(pwd)/.tmp_2 -c conda-forge "python==3.12" pip asv numpy
+$(pwd)/.tmp_2/bin/pip install .
+```
+
+Activating the environment is not necessary in this instance, but for more
+complex workflows where the installation can be more convoluted, feel free to
+work within the environment. Now we can run `asv`.
+
+``` sh
+➜ asv run -E existing:$(pwd)/.tmp_2/bin/python --record-samples --bench 'multi' --set-commit-hash "HEAD"   
+· Discovering benchmarks
+· Running 1 total benchmarks (1 commits * 1 environments * 1 benchmarks)
+[ 0.00%] · For asv_samples commit d6b286b8 <decorator-params>:
+[ 0.00%] ·· Building for existing-py_home_rgoswami_Git_Github_Quansight_asvWork_asv_samples_.tmp_2_bin_python
+[ 0.00%] ·· Benchmarking existing-py_home_rgoswami_Git_Github_Quansight_asvWork_asv_samples_.tmp_2_bin_python
+[50.00%] ··· Running (benchmarks.time_ranges_multi--).
+[100.00%] ··· benchmarks.time_ranges_multi                                                                                                                                                                         ok
+[100.00%] ··· ===== =========== =============
+              --            func_name        
+              ----- -------------------------
+                n      range        arange   
+              ===== =========== =============
+                10    197±1ns      1.12±0μs  
+               100   535±0.8ns   3.30±0.03μs 
+              ===== =========== =============
+
+➜ asv run -E existing:$(pwd)/.tmp_1/bin/python --record-samples --bench 'multi' --set-commit-hash "HEAD"
+· Discovering benchmarks
+· Running 1 total benchmarks (1 commits * 1 environments * 1 benchmarks)
+[ 0.00%] · For asv_samples commit d6b286b8 <decorator-params>:
+[ 0.00%] ·· Building for existing-py_home_rgoswami_Git_Github_Quansight_asvWork_asv_samples_.tmp_1_bin_python
+[ 0.00%] ·· Benchmarking existing-py_home_rgoswami_Git_Github_Quansight_asvWork_asv_samples_.tmp_1_bin_python
+[50.00%] ··· Running (benchmarks.time_ranges_multi--).
+[100.00%] ··· benchmarks.time_ranges_multi                                                                                                                                                                         ok
+[100.00%] ··· ===== ========= =============
+              --           func_name       
+              ----- -----------------------
+                n     range       arange   
+              ===== ========= =============
+                10   324±2ns     1.09±0μs  
+               100   729±4ns   3.25±0.03μs 
+              ===== ========= =============
+```
+
+Bear in mind that `--dry-run` or `-n` or `--python=same` will skip writing the
+results file, and therefore are not going to be relevant here.
+
+With the results files in place, it is now trivial to compare the results across environments.
+
+``` sh
+asv-spyglass compare .asv/results/rgx1gen11/*.tmp_1* .asv/results/rgx1gen11/*.tmp_2* .asv/results/benchmarks.json 
+| Change   | Before      | After       |   Ratio | Benchmark (Parameter)                                                                                                                                                                                                                          |
+|----------|-------------|-------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|          | 1.09±0μs    | 1.12±0μs    |    1.03 | benchmarks.time_ranges_multi(10, 'arange') [rgx1gen11/existing-py_home_asv_samples_.tmp_1_bin_python -> rgx1gen11/existing-py_home_asv_samples_.tmp_2_bin_python]  |
+| -        | 324±2ns     | 197±1ns     |    0.61 | benchmarks.time_ranges_multi(10, 'range') [rgx1gen11/existing-py_home_asv_samples_.tmp_1_bin_python -> rgx1gen11/existing-py_home_asv_samples_.tmp_2_bin_python]   |
+|          | 3.25±0.03μs | 3.30±0.03μs |    1.02 | benchmarks.time_ranges_multi(100, 'arange') [rgx1gen11/existing-py_home_asv_samples_.tmp_1_bin_python -> rgx1gen11/existing-py_home_asv_samples_.tmp_2_bin_python] |
+| -        | 729±4ns     | 535±0.8ns   |    0.73 | benchmarks.time_ranges_multi(100, 'range') [rgx1gen11/existing-py_home_asv_samples_.tmp_1_bin_python -> rgx1gen11/existing-py_home_asv_samples_.tmp_2_bin_python]  |
+```
 
 
 # Contributions
