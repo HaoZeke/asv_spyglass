@@ -24,9 +24,9 @@ class ReadOnlyASVBenchmarks:
                 Defaults to None (all benchmarks included).
         """
         d = asv_json_load(getstrform(benchmarks_file), api_version=self.api_version)
-        self._all_benchmarks = {}  # Store all benchmarks here
+        self._base_benchmarks = {}  # Store all benchmarks here
         self._benchmark_selection = {}  # Track selected parameter combinations
-        self.filtered_benchmarks = {}  # Store selected benchmarks here
+        self.filtered_benchmarks = {}  # Store selected benchmarks here after parameter expansion
 
         if not regex:
             regex = []
@@ -34,7 +34,7 @@ class ReadOnlyASVBenchmarks:
             regex = [regex]
 
         for benchmark in d.values():
-            self._all_benchmarks[benchmark["name"]] = benchmark
+            self._base_benchmarks[benchmark["name"]] = benchmark
             if benchmark["params"]:
                 self._benchmark_selection[benchmark["name"]] = []
                 for idx, param_set in enumerate(
@@ -51,25 +51,12 @@ class ReadOnlyASVBenchmarks:
                 if not regex or any(re.search(reg, benchmark["name"]) for reg in regex):
                     self.filtered_benchmarks[benchmark["name"]] = benchmark
 
-    def __iter__(self) -> Iterator[dict]:
-        """Iterate over the filtered benchmarks."""
-        return iter(self.filtered_benchmarks.values())
-
-    def __getitem__(self, name: str) -> Union[dict, None]:
-        """Get a benchmark by name."""
-        return self.filtered_benchmarks.get(name)
-
     def __repr__(self) -> str:
         """Return a string representation of the filtered benchmarks."""
         import pprint
 
         pp = pprint.PrettyPrinter()
         return pp.pformat(self.filtered_benchmarks)
-
-    @property
-    def benchmark_names(self) -> list[str]:
-        """Get a list of benchmark names."""
-        return list(self.filtered_benchmarks.keys())
 
     @property
     def benchmarks(self) -> dict[str, dict]:
