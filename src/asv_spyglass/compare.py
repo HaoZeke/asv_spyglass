@@ -123,12 +123,10 @@ def do_compare(
     units = prepared_results_1.units
 
     machine_env_names = set()
-    machine_env_names.add(
-        f"{prepared_results_1.machine_name}/{prepared_results_1.env_name}"
-    )
-    machine_env_names.add(
-        f"{prepared_results_2.machine_name}/{prepared_results_2.env_name}"
-    )
+    mname_1 = f"{prepared_results_1.machine_name}/{prepared_results_1.env_name}"
+    mname_2 = f"{prepared_results_2.machine_name}/{prepared_results_2.env_name}"
+    machine_env_names.add(mname_1)
+    machine_env_names.add(mname_2)
 
     benchmarks_1 = set(results_1.keys())
     benchmarks_2 = set(results_2.keys())
@@ -248,7 +246,7 @@ def do_compare(
         )
         split_line = details.split()
         if len(machine_env_names) > 1:
-            benchmark_name = "{} [{}]".format(benchmark, machine_env_names)
+            benchmark_name = f"{benchmark} [{mname_1} -> {mname_2}]"
         else:
             benchmark_name = benchmark
         if len(split_line) == 4:
