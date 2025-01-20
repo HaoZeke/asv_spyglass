@@ -2,7 +2,7 @@ import dataclasses
 import re
 from collections import namedtuple
 
-import pandas as pd
+import polars as pl
 from asv import results
 
 from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
@@ -59,8 +59,8 @@ class PreparedResult:
 
     def to_df(self):
         """
-        Converts a PreparedResult object to a Pandas DataFrame,
-        exploding the parameters in the keys and flattening the results.
+        Converts a PreparedResult object to a DataFrame, exploding the
+        parameters in the keys and flattening the results.
         """
 
         data = []
@@ -99,4 +99,4 @@ class PreparedResult:
             )
             data.append(row)
 
-        return pd.DataFrame(data)
+        return pl.DataFrame(data)

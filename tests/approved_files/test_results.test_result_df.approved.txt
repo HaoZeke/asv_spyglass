@@ -1,272 +1,255 @@
-{'benchmark_base': {0: 'benchmarks.TimeSuiteDecoratorSingle.time_keys',
-                    1: 'benchmarks.TimeSuiteDecoratorSingle.time_keys',
-                    2: 'benchmarks.TimeSuiteDecoratorSingle.time_keys',
-                    3: 'benchmarks.TimeSuiteDecoratorSingle.time_values',
-                    4: 'benchmarks.TimeSuiteDecoratorSingle.time_values',
-                    5: 'benchmarks.TimeSuiteDecoratorSingle.time_values',
-                    6: 'benchmarks.TimeSuiteMultiDecorator.time_ranges',
-                    7: 'benchmarks.TimeSuiteMultiDecorator.time_ranges',
-                    8: 'benchmarks.TimeSuiteMultiDecorator.time_ranges',
-                    9: 'benchmarks.TimeSuiteMultiDecorator.time_ranges',
-                    10: 'benchmarks.time_ranges_multi',
-                    11: 'benchmarks.time_ranges_multi',
-                    12: 'benchmarks.time_ranges_multi',
-                    13: 'benchmarks.time_ranges_multi',
-                    14: 'benchmarks.time_sort',
-                    15: 'benchmarks.time_sort'},
- 'ci_99_a': {0: 1.3444e-07,
-             1: 5.3813e-07,
-             2: 1.0672e-06,
-             3: 1.8023e-07,
-             4: 7.7445e-07,
-             5: 1.4525e-06,
-             6: 2.2972e-07,
-             7: 1.366e-06,
-             8: 6.4741e-07,
-             9: 3.7563e-06,
-             10: 1.7102e-07,
-             11: 1.0348e-06,
-             12: 4.3157e-07,
-             13: 3.0563e-06,
-             14: 1.0645e-06,
-             15: 1.6189e-06},
- 'ci_99_b': {0: 1.4947e-07,
-             1: 5.4586e-07,
-             2: 1.091e-06,
-             3: 1.9282e-07,
-             4: 7.9307e-07,
-             5: 1.4623e-06,
-             6: 2.3326e-07,
-             7: 1.3947e-06,
-             8: 6.5358e-07,
-             9: 3.9037e-06,
-             10: 1.7728e-07,
-             11: 1.0653e-06,
-             12: 4.3557e-07,
-             13: 3.1576e-06,
-             14: 1.3746e-06,
-             15: 1.6341e-06},
- 'env': {0: 'rattler-py3.12-numpy',
-         1: 'rattler-py3.12-numpy',
-         2: 'rattler-py3.12-numpy',
-         3: 'rattler-py3.12-numpy',
-         4: 'rattler-py3.12-numpy',
-         5: 'rattler-py3.12-numpy',
-         6: 'rattler-py3.12-numpy',
-         7: 'rattler-py3.12-numpy',
-         8: 'rattler-py3.12-numpy',
-         9: 'rattler-py3.12-numpy',
-         10: 'rattler-py3.12-numpy',
-         11: 'rattler-py3.12-numpy',
-         12: 'rattler-py3.12-numpy',
-         13: 'rattler-py3.12-numpy',
-         14: 'rattler-py3.12-numpy',
-         15: 'rattler-py3.12-numpy'},
- 'machine': {0: 'rgx1gen11',
-             1: 'rgx1gen11',
-             2: 'rgx1gen11',
-             3: 'rgx1gen11',
-             4: 'rgx1gen11',
-             5: 'rgx1gen11',
-             6: 'rgx1gen11',
-             7: 'rgx1gen11',
-             8: 'rgx1gen11',
-             9: 'rgx1gen11',
-             10: 'rgx1gen11',
-             11: 'rgx1gen11',
-             12: 'rgx1gen11',
-             13: 'rgx1gen11',
-             14: 'rgx1gen11',
-             15: 'rgx1gen11'},
- 'name': {0: 'benchmarks.TimeSuiteDecoratorSingle.time_keys(10)',
-          1: 'benchmarks.TimeSuiteDecoratorSingle.time_keys(100)',
-          2: 'benchmarks.TimeSuiteDecoratorSingle.time_keys(200)',
-          3: 'benchmarks.TimeSuiteDecoratorSingle.time_values(10)',
-          4: 'benchmarks.TimeSuiteDecoratorSingle.time_values(100)',
-          5: 'benchmarks.TimeSuiteDecoratorSingle.time_values(200)',
-          6: "benchmarks.TimeSuiteMultiDecorator.time_ranges(10, 'range')",
-          7: "benchmarks.TimeSuiteMultiDecorator.time_ranges(10, 'arange')",
-          8: "benchmarks.TimeSuiteMultiDecorator.time_ranges(100, 'range')",
-          9: "benchmarks.TimeSuiteMultiDecorator.time_ranges(100, 'arange')",
-          10: "benchmarks.time_ranges_multi(10, 'range')",
-          11: "benchmarks.time_ranges_multi(10, 'arange')",
-          12: "benchmarks.time_ranges_multi(100, 'range')",
-          13: "benchmarks.time_ranges_multi(100, 'arange')",
-          14: 'benchmarks.time_sort(10)',
-          15: 'benchmarks.time_sort(100)'},
- 'number': {0: 67364,
-            1: 16815,
-            2: 8960,
-            3: 63961,
-            4: 15516,
-            5: 8748,
-            6: 51698,
-            7: 9417,
-            8: 20005,
-            9: 3213,
-            10: 54349,
-            11: 9631,
-            12: 20588,
-            13: 3042,
-            14: 9345,
-            15: 5828},
- 'param_func_name': {0: nan,
-                     1: nan,
-                     2: nan,
-                     3: nan,
-                     4: nan,
-                     5: nan,
-                     6: "'range'",
-                     7: "'arange'",
-                     8: "'range'",
-                     9: "'arange'",
-                     10: "'range'",
-                     11: "'arange'",
-                     12: "'range'",
-                     13: "'arange'",
-                     14: nan,
-                     15: nan},
- 'param_n': {0: nan,
-             1: nan,
-             2: nan,
-             3: nan,
-             4: nan,
-             5: nan,
-             6: '10',
-             7: '10',
-             8: '100',
-             9: '100',
-             10: '10',
-             11: '10',
-             12: '100',
-             13: '100',
-             14: '10',
-             15: '100'},
- 'param_size': {0: '10',
-                1: '100',
-                2: '200',
-                3: '10',
-                4: '100',
-                5: '200',
-                6: nan,
-                7: nan,
-                8: nan,
-                9: nan,
-                10: nan,
-                11: nan,
-                12: nan,
-                13: nan,
-                14: nan,
-                15: nan},
- 'q_25': {0: 1.3621e-07,
-          1: 5.419e-07,
-          2: 1.0707e-06,
-          3: 1.8595e-07,
-          4: 7.8003e-07,
-          5: 1.4593e-06,
-          6: 2.3038e-07,
-          7: 1.3691e-06,
-          8: 6.4921e-07,
-          9: 3.8065e-06,
-          10: 1.7412e-07,
-          11: 1.0378e-06,
-          12: 4.3176e-07,
-          13: 3.0622e-06,
-          14: 1.0715e-06,
-          15: 1.6225e-06},
- 'q_75': {0: 1.431e-07,
-          1: 5.4495e-07,
-          2: 1.0782e-06,
-          3: 1.9121e-07,
-          4: 7.8758e-07,
-          5: 1.4621e-06,
-          6: 2.3224e-07,
-          7: 1.3791e-06,
-          8: 6.5143e-07,
-          9: 3.8388e-06,
-          10: 1.7638e-07,
-          11: 1.044e-06,
-          12: 4.342e-07,
-          13: 3.1181e-06,
-          14: 1.0777e-06,
-          15: 1.6326e-06},
- 'repeat': {0: 10,
-            1: 10,
-            2: 10,
-            3: 10,
-            4: 10,
-            5: 10,
-            6: 10,
-            7: 10,
-            8: 10,
-            9: 10,
-            10: 10,
-            11: 10,
-            12: 10,
-            13: 10,
-            14: 10,
-            15: 10},
- 'result': {0: 1.37378532884605e-07,
-            1: 5.429162653926854e-07,
-            2: 1.0728282369663897e-06,
-            3: 1.870523832540821e-07,
-            4: 7.847095893996428e-07,
-            5: 1.4613044126333168e-06,
-            6: 2.3096740716340811e-07,
-            7: 1.3737530519982098e-06,
-            8: 6.507371149493031e-07,
-            9: 3.831307194414474e-06,
-            10: 1.75908075758346e-07,
-            11: 1.04194673574825e-06,
-            12: 4.322195698640758e-07,
-            13: 3.0868006284377445e-06,
-            14: 1.0754531829770897e-06,
-            15: 1.6311290342036977e-06},
- 'samples': {0: None,
-             1: None,
-             2: None,
-             3: None,
-             4: None,
-             5: None,
-             6: None,
-             7: None,
-             8: None,
-             9: None,
-             10: None,
-             11: None,
-             12: None,
-             13: None,
-             14: None,
-             15: None},
- 'units': {0: 'seconds',
-           1: 'seconds',
-           2: 'seconds',
-           3: 'seconds',
-           4: 'seconds',
-           5: 'seconds',
-           6: 'seconds',
-           7: 'seconds',
-           8: 'seconds',
-           9: 'seconds',
-           10: 'seconds',
-           11: 'seconds',
-           12: 'seconds',
-           13: 'seconds',
-           14: 'seconds',
-           15: 'seconds'},
- 'version': {0: '64746c9051ff76aa879b428c27b4247e8ed976c44a40579ae9aa4601b9883ed5',
-             1: '64746c9051ff76aa879b428c27b4247e8ed976c44a40579ae9aa4601b9883ed5',
-             2: '64746c9051ff76aa879b428c27b4247e8ed976c44a40579ae9aa4601b9883ed5',
-             3: 'ab162b6142a1390a0e2a667ed8d2d3285f77152d9caa559b4fd784bb120aa153',
-             4: 'ab162b6142a1390a0e2a667ed8d2d3285f77152d9caa559b4fd784bb120aa153',
-             5: 'ab162b6142a1390a0e2a667ed8d2d3285f77152d9caa559b4fd784bb120aa153',
-             6: 'bf8381bfa42fb47f084462e83ab870e9779fb25535168f77415db72845b02f6d',
-             7: 'bf8381bfa42fb47f084462e83ab870e9779fb25535168f77415db72845b02f6d',
-             8: 'bf8381bfa42fb47f084462e83ab870e9779fb25535168f77415db72845b02f6d',
-             9: 'bf8381bfa42fb47f084462e83ab870e9779fb25535168f77415db72845b02f6d',
-             10: 'f9ae8b134446c273c0d3eb1e90246ae0d6f99389d06119dfe4fed7210eccdb15',
-             11: 'f9ae8b134446c273c0d3eb1e90246ae0d6f99389d06119dfe4fed7210eccdb15',
-             12: 'f9ae8b134446c273c0d3eb1e90246ae0d6f99389d06119dfe4fed7210eccdb15',
-             13: 'f9ae8b134446c273c0d3eb1e90246ae0d6f99389d06119dfe4fed7210eccdb15',
-             14: '60785bf757da0254d857b696482db7a25509a5b28a2c9d2a54e85d2a593ce272',
-             15: '60785bf757da0254d857b696482db7a25509a5b28a2c9d2a54e85d2a593ce272'}}
+{'benchmark_base': shape: (16,)
+Series: 'benchmark_base' [str]
+[
+	"benchmarks.TimeSuiteDecoratorS…
+	"benchmarks.TimeSuiteDecoratorS…
+	"benchmarks.TimeSuiteDecoratorS…
+	"benchmarks.TimeSuiteDecoratorS…
+	"benchmarks.TimeSuiteDecoratorS…
+	…
+	"benchmarks.time_ranges_multi"
+	"benchmarks.time_ranges_multi"
+	"benchmarks.time_ranges_multi"
+	"benchmarks.time_sort"
+	"benchmarks.time_sort"
+],
+ 'ci_99_a': shape: (16,)
+Series: 'ci_99_a' [f64]
+[
+	1.3444e-7
+	5.3813e-7
+	0.000001
+	1.8023e-7
+	7.7445e-7
+	…
+	0.000001
+	4.3157e-7
+	0.000003
+	0.000001
+	0.000002
+],
+ 'ci_99_b': shape: (16,)
+Series: 'ci_99_b' [f64]
+[
+	1.4947e-7
+	5.4586e-7
+	0.000001
+	1.9282e-7
+	7.9307e-7
+	…
+	0.000001
+	4.3557e-7
+	0.000003
+	0.000001
+	0.000002
+],
+ 'env': shape: (16,)
+Series: 'env' [str]
+[
+	"rattler-py3.12-numpy"
+	"rattler-py3.12-numpy"
+	"rattler-py3.12-numpy"
+	"rattler-py3.12-numpy"
+	"rattler-py3.12-numpy"
+	…
+	"rattler-py3.12-numpy"
+	"rattler-py3.12-numpy"
+	"rattler-py3.12-numpy"
+	"rattler-py3.12-numpy"
+	"rattler-py3.12-numpy"
+],
+ 'machine': shape: (16,)
+Series: 'machine' [str]
+[
+	"rgx1gen11"
+	"rgx1gen11"
+	"rgx1gen11"
+	"rgx1gen11"
+	"rgx1gen11"
+	…
+	"rgx1gen11"
+	"rgx1gen11"
+	"rgx1gen11"
+	"rgx1gen11"
+	"rgx1gen11"
+],
+ 'name': shape: (16,)
+Series: 'name' [str]
+[
+	"benchmarks.TimeSuiteDecoratorS…
+	"benchmarks.TimeSuiteDecoratorS…
+	"benchmarks.TimeSuiteDecoratorS…
+	"benchmarks.TimeSuiteDecoratorS…
+	"benchmarks.TimeSuiteDecoratorS…
+	…
+	"benchmarks.time_ranges_multi(1…
+	"benchmarks.time_ranges_multi(1…
+	"benchmarks.time_ranges_multi(1…
+	"benchmarks.time_sort(10)"
+	"benchmarks.time_sort(100)"
+],
+ 'number': shape: (16,)
+Series: 'number' [i64]
+[
+	67364
+	16815
+	8960
+	63961
+	15516
+	…
+	9631
+	20588
+	3042
+	9345
+	5828
+],
+ 'param_func_name': shape: (16,)
+Series: 'param_func_name' [str]
+[
+	null
+	null
+	null
+	null
+	null
+	…
+	"'arange'"
+	"'range'"
+	"'arange'"
+	null
+	null
+],
+ 'param_n': shape: (16,)
+Series: 'param_n' [str]
+[
+	null
+	null
+	null
+	null
+	null
+	…
+	"10"
+	"100"
+	"100"
+	"10"
+	"100"
+],
+ 'param_size': shape: (16,)
+Series: 'param_size' [str]
+[
+	"10"
+	"100"
+	"200"
+	"10"
+	"100"
+	…
+	null
+	null
+	null
+	null
+	null
+],
+ 'q_25': shape: (16,)
+Series: 'q_25' [f64]
+[
+	1.3621e-7
+	5.4190e-7
+	0.000001
+	1.8595e-7
+	7.8003e-7
+	…
+	0.000001
+	4.3176e-7
+	0.000003
+	0.000001
+	0.000002
+],
+ 'q_75': shape: (16,)
+Series: 'q_75' [f64]
+[
+	1.4310e-7
+	5.4495e-7
+	0.000001
+	1.9121e-7
+	7.8758e-7
+	…
+	0.000001
+	4.3420e-7
+	0.000003
+	0.000001
+	0.000002
+],
+ 'repeat': shape: (16,)
+Series: 'repeat' [i64]
+[
+	10
+	10
+	10
+	10
+	10
+	…
+	10
+	10
+	10
+	10
+	10
+],
+ 'result': shape: (16,)
+Series: 'result' [f64]
+[
+	1.3738e-7
+	5.4292e-7
+	0.000001
+	1.8705e-7
+	7.8471e-7
+	…
+	0.000001
+	4.3222e-7
+	0.000003
+	0.000001
+	0.000002
+],
+ 'samples': shape: (16,)
+Series: 'samples' [null]
+[
+	null
+	null
+	null
+	null
+	null
+	…
+	null
+	null
+	null
+	null
+	null
+],
+ 'units': shape: (16,)
+Series: 'units' [str]
+[
+	"seconds"
+	"seconds"
+	"seconds"
+	"seconds"
+	"seconds"
+	…
+	"seconds"
+	"seconds"
+	"seconds"
+	"seconds"
+	"seconds"
+],
+ 'version': shape: (16,)
+Series: 'version' [str]
+[
+	"64746c9051ff76aa879b428c27b424…
+	"64746c9051ff76aa879b428c27b424…
+	"64746c9051ff76aa879b428c27b424…
+	"ab162b6142a1390a0e2a667ed8d2d3…
+	"ab162b6142a1390a0e2a667ed8d2d3…
+	…
+	"f9ae8b134446c273c0d3eb1e90246a…
+	"f9ae8b134446c273c0d3eb1e90246a…
+	"f9ae8b134446c273c0d3eb1e90246a…
+	"60785bf757da0254d857b696482db7…
+	"60785bf757da0254d857b696482db7…
+]}

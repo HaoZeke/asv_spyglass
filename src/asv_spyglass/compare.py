@@ -1,7 +1,7 @@
 import math
 from pathlib import Path
 
-import pandas as pd
+import polars as pl
 import tabulate
 from asv import results
 from asv.commands.compare import _is_result_better, _isna, unroll_result
