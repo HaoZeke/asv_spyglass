@@ -76,6 +76,17 @@ class PreparedResult:
 
             # Flatten the results tuple
             stats_dict, samples = self.stats[key]
+            if stats_dict is None:
+                stats_dict_maybe_null = {
+                    "ci_99_a": None,
+                    "ci_99_b": None,
+                    "q_25": None,
+                    "q_75": None,
+                    "number": None,
+                    "repeat": None,
+                }
+            else:
+                stats_dict_maybe_null = stats_dict
 
             row = {
                 "benchmark_base": benchmark_name,
@@ -85,7 +96,7 @@ class PreparedResult:
                 "machine": self.machine_name,
                 "env": self.env_name,
                 "version": self.versions[key],
-                **stats_dict,  # Expand the stats dictionary
+                **stats_dict_maybe_null,  # Expand the stats dictionary
                 "samples": samples,
             }
             # Combine param and parameter name for column names
