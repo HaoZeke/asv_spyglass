@@ -1,6 +1,4 @@
-import dataclasses
 import math
-import re
 from pathlib import Path
 
 import pandas as pd
@@ -13,74 +11,7 @@ from asv_runner.console import color_print
 from asv_runner.statistics import get_err
 
 from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
-from asv_spyglass.results import result_iter
-
-
-@dataclasses.dataclass
-class PreparedResult:
-    """Augmented with information from the benchmarks.json"""
-
-    units: dict
-    results: dict
-    stats: dict
-    versions: dict
-    machine_name: str
-    env_name: str
-    param_names: list
-
-    def __iter__(self):
-        for field in dataclasses.fields(self):
-            yield getattr(self, field.name)
-
-
-def prepared_result_to_dataframe(prepared_result):
-    """
-    Converts a PreparedResult object to a Pandas DataFrame,
-    exploding the parameters in the keys and flattening the results.
-    """
-
-    data = []
-    for key, result in prepared_result.results.items():
-        # Extract benchmark name and parameters
-        match = re.match(r"(.+)\((.*)\)", key)
-        if match:
-            benchmark_name = match.group(1)
-            params = match.group(2).split(", ")
-        else:
-            benchmark_name = key
-            params = []
-
-        # Flatten the results tuple
-        stats_dict, samples = prepared_result.stats[key]
-
-        row = {
-            "benchmark_base": benchmark_name,
-            "name": key,
-            "result": result,
-            "units": prepared_result.units[key],
-            "machine": prepared_result.machine_name,
-            "env": prepared_result.env_name,
-            "version": prepared_result.versions[key],
-            **stats_dict,  # Expand the stats dictionary
-            "samples": samples,
-        }
-        # row.update(dict(zip(["param_" + str(i) for i in range(len(params))], params)))
-        # row.update(dict(zip(prepared_result.param_names[key], params)))
-        # Combine numeric index and parameter name for column names
-        row.update(
-            dict(
-                zip(
-                    [
-                        f"param_{i}_{name}"
-                        for i, name in enumerate(prepared_result.param_names[key])
-                    ],
-                    params,
-                )
-            )
-        )
-        data.append(row)
-
-    return pd.DataFrame(data)
+from asv_spyglass.results import PreparedResult, result_iter
 
 
 class ResultPreparer:
@@ -181,7 +112,6 @@ def do_compare(
     prepared_results_1 = preparer.prepare(res_1)
     prepared_results_2 = preparer.prepare(res_2)
     # Kanged from compare.py
-    par1 = prepared_result_to_dataframe(prepared_results_1)
 
     # Extract data from prepared results
     results_1 = prepared_results_1.results

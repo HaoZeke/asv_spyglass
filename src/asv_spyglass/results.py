@@ -1,3 +1,5 @@
+import dataclasses
+import re
 from collections import namedtuple
 
 import pandas as pd
@@ -39,39 +41,67 @@ def result_iter(bdot):
         )
 
 
-def asv_df(bdat: ReadOnlyASVBenchmarks, rb1: results.Results):
-    dfl = []
-    for key in rb1.get_all_result_keys():
-        # From the results object
-        params = rb1.get_result_params(key)
-        result_value = rb1.get_result_value(key, params)
-        result_stats = rb1.get_result_stats(key, params)
-        result_samples = rb1.get_result_samples(key, params)
-        result_version = rb1.benchmark_version.get(key)
-        env_name = rb1.env_name
-        machine_name = rb1.params["machine"]
+@dataclasses.dataclass
+class PreparedResult:
+    """Augmented with information from the benchmarks.json"""
 
-        # Get benchmark information
-        bench_key = [x for x in bdat._base_benchmarks if key in x][0]
-        units = bdat._base_benchmarks.get(bench_key, {}).get("unit")
-        btype = bdat._base_benchmarks.get(bench_key, {}).get("type")
-        param_names = bdat._base_benchmarks.get(bench_key, {}).get("param_names")
+    units: dict
+    results: dict
+    stats: dict
+    versions: dict
+    machine_name: str
+    env_name: str
+    param_names: list
 
-        res = {
-            "key": key,
-            "params": params,
-            "value": result_value,
-            "samples": result_samples,
-            "result_stats": result_stats,
-            "version": result_version,
-            "machine": machine_name,
-            "env_name": env_name,
-            "units": units,
-            "btype": btype,
-            "param_names": param_names,
-        }
-        dfl.append(res)
+    def __iter__(self):
+        for field in dataclasses.fields(self):
+            yield getattr(self, field.name)
 
-    df = pd.DataFrame(dfl)
+    def to_df(self):
+        """
+        Converts a PreparedResult object to a Pandas DataFrame,
+        exploding the parameters in the keys and flattening the results.
+        """
 
-    return df
+        data = []
+        for key, result in self.results.items():
+            # Extract benchmark name and parameters
+            match = re.match(r"(.+)\((.*)\)", key)
+            if match:
+                benchmark_name = match.group(1)
+                params = match.group(2).split(", ")
+            else:
+                benchmark_name = key
+                params = []
+
+            # Flatten the results tuple
+            stats_dict, samples = self.stats[key]
+
+            row = {
+                "benchmark_base": benchmark_name,
+                "name": key,
+                "result": result,
+                "units": self.units[key],
+                "machine": self.machine_name,
+                "env": self.env_name,
+                "version": self.versions[key],
+                **stats_dict,  # Expand the stats dictionary
+                "samples": samples,
+            }
+            # row.update(dict(zip(["param_" + str(i) for i in range(len(params))], params)))
+            # row.update(dict(zip(self.param_names[key], params)))
+            # Combine numeric index and parameter name for column names
+            row.update(
+                dict(
+                    zip(
+                        [
+                            f"param_{i}_{name}"
+                            for i, name in enumerate(self.param_names[key])
+                        ],
+                        params,
+                    )
+                )
+            )
+            data.append(row)
+
+        return pd.DataFrame(data)
