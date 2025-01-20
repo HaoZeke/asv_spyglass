@@ -1,9 +1,9 @@
-import math
 import dataclasses
-import pandas as pd
+import math
 import re
 from pathlib import Path
 
+import pandas as pd
 import tabulate
 from asv import results
 from asv.commands.compare import _is_result_better, _isna, unroll_result
@@ -13,15 +13,20 @@ from asv_runner.console import color_print
 from asv_runner.statistics import get_err
 
 from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
+from asv_spyglass.results import result_iter
 
 
 @dataclasses.dataclass
 class PreparedResult:
+    """Augmented with information from the benchmarks.json"""
+
     units: dict
     results: dict
     stats: dict
     versions: dict
-    machine_env_name: str
+    machine_name: str
+    env_name: str
+    param_names: list
 
     def __iter__(self):
         for field in dataclasses.fields(self):
@@ -49,37 +54,33 @@ def prepared_result_to_dataframe(prepared_result):
         stats_dict, samples = prepared_result.stats[key]
 
         row = {
-            "benchmark_name": benchmark_name,
+            "benchmark_base": benchmark_name,
+            "name": key,
             "result": result,
             "units": prepared_result.units[key],
-            "machine_env_name": prepared_result.machine_env_name,
+            "machine": prepared_result.machine_name,
+            "env": prepared_result.env_name,
             "version": prepared_result.versions[key],
             **stats_dict,  # Expand the stats dictionary
             "samples": samples,
         }
-        row.update(dict(zip(["param_" + str(i) for i in range(len(params))], params)))
+        # row.update(dict(zip(["param_" + str(i) for i in range(len(params))], params)))
+        # row.update(dict(zip(prepared_result.param_names[key], params)))
+        # Combine numeric index and parameter name for column names
+        row.update(
+            dict(
+                zip(
+                    [
+                        f"param_{i}_{name}"
+                        for i, name in enumerate(prepared_result.param_names[key])
+                    ],
+                    params,
+                )
+            )
+        )
         data.append(row)
 
     return pd.DataFrame(data)
-
-
-def result_iter(bdot):
-    for key in bdot.get_all_result_keys():
-        params = bdot.get_result_params(key)
-        result_value = bdot.get_result_value(key, params)
-        result_stats = bdot.get_result_stats(key, params)
-        result_samples = bdot.get_result_samples(key, params)
-        result_version = bdot.benchmark_version.get(key)
-        yield (
-            key,
-            params,
-            result_value,
-            result_stats,
-            result_samples,
-            result_version,
-            bdot.params["machine"],
-            bdot.env_name,
-        )
 
 
 class ResultPreparer:
@@ -112,6 +113,9 @@ class ResultPreparer:
         results = {}
         ss = {}
         versions = {}
+        param_names = {}
+        btype = {}
+        machine_env_name = None
 
         for (
             key,
@@ -127,23 +131,29 @@ class ResultPreparer:
             for name, value, stats, samples in unroll_result(
                 key, params, value, stats, samples
             ):
-                # HACK(hz): The names already include the parameters i.e.
-                # benchmark(param) so this works around the situation
-                bench_key = [x for x in self.benchmarks.keys() if key in x][0]
-                units[name] = self.benchmarks.get(bench_key, {}).get("unit")
                 results[name] = value
                 # TODO(hz): Split samples out later when _is_result_better is
                 # not used anymore, currently in a tuple for ASV compatibility
                 ss[name] = (stats, samples)
                 versions[name] = version
-                breakpoint()
+                # HACK(hz): The names already include the parameters i.e.
+                # benchmark(param) so this works around the situation
+                bench_key = [x for x in self.benchmarks.keys() if key in x][0]
+                units[name] = self.benchmarks.get(bench_key, {}).get("unit")
+                btype[name] = self.benchmarks.get(bench_key, {}).get("type")
+                param_names[name] = self.benchmarks.get(bench_key, {}).get(
+                    "param_names"
+                )
 
+        machine, env_name = machine_env_name.split("/")
         return PreparedResult(
             units=units,
             results=results,
             stats=ss,
             versions=versions,
-            machine_env_name=machine_env_name,
+            machine_name=machine,
+            env_name=env_name,
+            param_names=param_names,
         )
 
 
@@ -171,6 +181,7 @@ def do_compare(
     prepared_results_1 = preparer.prepare(res_1)
     prepared_results_2 = preparer.prepare(res_2)
     # Kanged from compare.py
+    par1 = prepared_result_to_dataframe(prepared_results_1)
 
     # Extract data from prepared results
     results_1 = prepared_results_1.results
@@ -182,8 +193,12 @@ def do_compare(
     units = prepared_results_1.units
 
     machine_env_names = set()
-    machine_env_names.add(prepared_results_1.machine_env_name)
-    machine_env_names.add(prepared_results_2.machine_env_name)
+    machine_env_names.add(
+        f"{prepared_results_1.machine_name}/{prepared_results_1.env_name}"
+    )
+    machine_env_names.add(
+        f"{prepared_results_2.machine_name}/{prepared_results_2.env_name}"
+    )
 
     benchmarks_1 = set(results_1.keys())
     benchmarks_2 = set(results_2.keys())
@@ -359,7 +374,6 @@ def do_compare(
         else:
             raise ValueError("Unknown 'sort'")
 
-        breakpoint()
         print(worsened, improved)
         return tabulate.tabulate(
             bench[key],
