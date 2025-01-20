@@ -44,23 +44,24 @@ inspection.
 
 ``` sh
 ➜ asv-spyglass to-df tests/data/d6b286b8-rattler-py3.12-numpy.json tests/data/d6b286b8_asv_samples_benchmarks.json
-                                     benchmark_base                                               name        result    units    machine                   env  ... number  repeat  samples  param_size  param_n  param_func_name
-0     benchmarks.TimeSuiteDecoratorSingle.time_keys  benchmarks.TimeSuiteDecoratorSingle.time_keys(10)  1.373785e-07  seconds  rgx1gen11  rattler-py3.12-numpy  ...  67364      10     None          10      NaN              NaN
-1     benchmarks.TimeSuiteDecoratorSingle.time_keys  benchmarks.TimeSuiteDecoratorSingle.time_keys(...  5.429163e-07  seconds  rgx1gen11  rattler-py3.12-numpy  ...  16815      10     None         100      NaN              NaN
-2     benchmarks.TimeSuiteDecoratorSingle.time_keys  benchmarks.TimeSuiteDecoratorSingle.time_keys(...  1.072828e-06  seconds  rgx1gen11  rattler-py3.12-numpy  ...   8960      10     None         200      NaN              NaN
-3   benchmarks.TimeSuiteDecoratorSingle.time_values  benchmarks.TimeSuiteDecoratorSingle.time_value...  1.870524e-07  seconds  rgx1gen11  rattler-py3.12-numpy  ...  63961      10     None          10      NaN              NaN
-4   benchmarks.TimeSuiteDecoratorSingle.time_values  benchmarks.TimeSuiteDecoratorSingle.time_value...  7.847096e-07  seconds  rgx1gen11  rattler-py3.12-numpy  ...  15516      10     None         100      NaN              NaN
-5   benchmarks.TimeSuiteDecoratorSingle.time_values  benchmarks.TimeSuiteDecoratorSingle.time_value...  1.461304e-06  seconds  rgx1gen11  rattler-py3.12-numpy  ...   8748      10     None         200      NaN              NaN
-6    benchmarks.TimeSuiteMultiDecorator.time_ranges  benchmarks.TimeSuiteMultiDecorator.time_ranges...  2.309674e-07  seconds  rgx1gen11  rattler-py3.12-numpy  ...  51698      10     None         NaN       10          'range'
-7    benchmarks.TimeSuiteMultiDecorator.time_ranges  benchmarks.TimeSuiteMultiDecorator.time_ranges...  1.373753e-06  seconds  rgx1gen11  rattler-py3.12-numpy  ...   9417      10     None         NaN       10         'arange'
-8    benchmarks.TimeSuiteMultiDecorator.time_ranges  benchmarks.TimeSuiteMultiDecorator.time_ranges...  6.507371e-07  seconds  rgx1gen11  rattler-py3.12-numpy  ...  20005      10     None         NaN      100          'range'
-9    benchmarks.TimeSuiteMultiDecorator.time_ranges  benchmarks.TimeSuiteMultiDecorator.time_ranges...  3.831307e-06  seconds  rgx1gen11  rattler-py3.12-numpy  ...   3213      10     None         NaN      100         'arange'
-10                     benchmarks.time_ranges_multi          benchmarks.time_ranges_multi(10, 'range')  1.759081e-07  seconds  rgx1gen11  rattler-py3.12-numpy  ...  54349      10     None         NaN       10          'range'
-11                     benchmarks.time_ranges_multi         benchmarks.time_ranges_multi(10, 'arange')  1.041947e-06  seconds  rgx1gen11  rattler-py3.12-numpy  ...   9631      10     None         NaN       10         'arange'
-12                     benchmarks.time_ranges_multi         benchmarks.time_ranges_multi(100, 'range')  4.322196e-07  seconds  rgx1gen11  rattler-py3.12-numpy  ...  20588      10     None         NaN      100          'range'
-13                     benchmarks.time_ranges_multi        benchmarks.time_ranges_multi(100, 'arange')  3.086801e-06  seconds  rgx1gen11  rattler-py3.12-numpy  ...   3042      10     None         NaN      100         'arange'
-14                             benchmarks.time_sort                           benchmarks.time_sort(10)  1.075453e-06  seconds  rgx1gen11  rattler-py3.12-numpy  ...   9345      10     None         NaN       10              NaN
-15                             benchmarks.time_sort                          benchmarks.time_sort(100)  1.631129e-06  seconds  rgx1gen11  rattler-py3.12-numpy  ...   5828      10     None         NaN      100              NaN
+shape: (16, 17)
+┌─────────────────────────────────┬─────────────────────────────────┬───────────┬─────────┬───┬─────────┬────────────┬─────────┬─────────────────┐
+│ benchmark_base                  ┆ name                            ┆ result    ┆ units   ┆ … ┆ samples ┆ param_size ┆ param_n ┆ param_func_name │
+│ ---                             ┆ ---                             ┆ ---       ┆ ---     ┆   ┆ ---     ┆ ---        ┆ ---     ┆ ---             │
+│ str                             ┆ str                             ┆ f64       ┆ str     ┆   ┆ null    ┆ str        ┆ str     ┆ str             │
+╞═════════════════════════════════╪═════════════════════════════════╪═══════════╪═════════╪═══╪═════════╪════════════╪═════════╪═════════════════╡
+│ benchmarks.TimeSuiteDecoratorS… ┆ benchmarks.TimeSuiteDecoratorS… ┆ 1.3738e-7 ┆ seconds ┆ … ┆ null    ┆ 10         ┆ null    ┆ null            │
+│ benchmarks.TimeSuiteDecoratorS… ┆ benchmarks.TimeSuiteDecoratorS… ┆ 5.4292e-7 ┆ seconds ┆ … ┆ null    ┆ 100        ┆ null    ┆ null            │
+│ benchmarks.TimeSuiteDecoratorS… ┆ benchmarks.TimeSuiteDecoratorS… ┆ 0.000001  ┆ seconds ┆ … ┆ null    ┆ 200        ┆ null    ┆ null            │
+│ benchmarks.TimeSuiteDecoratorS… ┆ benchmarks.TimeSuiteDecoratorS… ┆ 1.8705e-7 ┆ seconds ┆ … ┆ null    ┆ 10         ┆ null    ┆ null            │
+│ benchmarks.TimeSuiteDecoratorS… ┆ benchmarks.TimeSuiteDecoratorS… ┆ 7.8471e-7 ┆ seconds ┆ … ┆ null    ┆ 100        ┆ null    ┆ null            │
+│ …                               ┆ …                               ┆ …         ┆ …       ┆ … ┆ …       ┆ …          ┆ …       ┆ …               │
+│ benchmarks.time_ranges_multi    ┆ benchmarks.time_ranges_multi(1… ┆ 0.000001  ┆ seconds ┆ … ┆ null    ┆ null       ┆ 10      ┆ 'arange'        │
+│ benchmarks.time_ranges_multi    ┆ benchmarks.time_ranges_multi(1… ┆ 4.3222e-7 ┆ seconds ┆ … ┆ null    ┆ null       ┆ 100     ┆ 'range'         │
+│ benchmarks.time_ranges_multi    ┆ benchmarks.time_ranges_multi(1… ┆ 0.000003  ┆ seconds ┆ … ┆ null    ┆ null       ┆ 100     ┆ 'arange'        │
+│ benchmarks.time_sort            ┆ benchmarks.time_sort(10)        ┆ 0.000001  ┆ seconds ┆ … ┆ null    ┆ null       ┆ 10      ┆ null            │
+│ benchmarks.time_sort            ┆ benchmarks.time_sort(100)       ┆ 0.000002  ┆ seconds ┆ … ┆ null    ┆ null       ┆ 100     ┆ null            │
+└─────────────────────────────────┴─────────────────────────────────┴───────────┴─────────┴───┴─────────┴────────────┴─────────┴─────────────────┘
 ```
 
 
