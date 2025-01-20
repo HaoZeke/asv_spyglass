@@ -4,7 +4,14 @@ from approvaltests.approvals import verify
 from asv import results
 
 from asv_spyglass._aux import getstrform
-from asv_spyglass.compare import do_compare, result_iter
+from asv_spyglass.compare import (
+    do_compare,
+    result_iter,
+    prepared_result_to_dataframe,
+    ResultPreparer,
+)
+
+from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
 
 
 def test_result_iter(shared_datadir):
@@ -22,3 +29,15 @@ def test_do_compare(shared_datadir):
             shared_datadir / "asv_samples_a0f29428_benchmarks.json",
         )
     )
+
+
+def test_result_df(shared_datadir):
+    res = results.Results.load(
+        getstrform(shared_datadir / "d6b286b8-rattler-py3.12-numpy.json")
+    )
+    benchdat = ReadOnlyASVBenchmarks(
+        shared_datadir / "d6b286b8_asv_samples_benchmarks.json"
+    ).benchmarks
+    preparer = ResultPreparer(benchdat)
+    pres1 = prepared_result_to_dataframe(preparer.prepare(res))
+    verify(pp.pformat(pres1.to_dict()))
