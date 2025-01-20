@@ -8,10 +8,10 @@ from asv_spyglass.compare import do_compare, result_iter
 
 
 def test_result_iter(shared_datadir):
-    bdot = results.Results.load(
+    res = results.Results.load(
         getstrform(shared_datadir / "a0f29428-conda-py3.11-numpy.json")
     )
-    verify(pp.pformat(list(result_iter(bdot))))
+    verify(pp.pformat([tuple(x) for x in (result_iter(res))]))
 
 
 def test_do_compare(shared_datadir):
