@@ -9,10 +9,12 @@ extension.
 
 ### Comparing two benchmarks
 
-This is agnostic to environment.
+This is agnostic to the environment, however the `benchmarks.json` is required.
+The practical usage of this command is to compare `asv` runs from builds which
+are not handled by the `asv` environment management machinery.
 
 ``` sh
-asv-spyglass compare tests/data/d6b286b8-virtualenv-py3.12-numpy.json tests/data/d6b286b8-rattler-py3.12-numpy.json tests/data/d6b286b8_asv_samples_benchmarks.json
+➜ asv-spyglass compare tests/data/d6b286b8-virtualenv-py3.12-numpy.json tests/data/d6b286b8-rattler-py3.12-numpy.json tests/data/d6b286b8_asv_samples_benchmarks.json
 
 
 | Change   | Before      | After       |   Ratio | Benchmark (Parameter)                                                                                                               |
