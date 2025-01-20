@@ -102,7 +102,7 @@ complex workflows where the installation can be more convoluted, feel free to
 work within the environment. Now we can run `asv`.
 
 ``` sh
-➜ asv run -E existing:$(pwd)/.tmp_2/bin/python --record-samples --bench 'multi' --set-commit-hash "HEAD"   
+➜ asv run -E existing:$(pwd)/.tmp_2/bin/python --record-samples --bench 'multi' --set-commit-hash "HEAD"
 · Discovering benchmarks
 · Running 1 total benchmarks (1 commits * 1 environments * 1 benchmarks)
 [ 0.00%] · For asv_samples commit d6b286b8 <decorator-params>:
@@ -111,12 +111,12 @@ work within the environment. Now we can run `asv`.
 [50.00%] ··· Running (benchmarks.time_ranges_multi--).
 [100.00%] ··· benchmarks.time_ranges_multi                                                                                                                                                                         ok
 [100.00%] ··· ===== =========== =============
-              --            func_name        
+              --            func_name
               ----- -------------------------
-                n      range        arange   
+                n      range        arange
               ===== =========== =============
-                10    197±1ns      1.12±0μs  
-               100   535±0.8ns   3.30±0.03μs 
+                10    197±1ns      1.12±0μs
+               100   535±0.8ns   3.30±0.03μs
               ===== =========== =============
 
 ➜ asv run -E existing:$(pwd)/.tmp_1/bin/python --record-samples --bench 'multi' --set-commit-hash "HEAD"
@@ -128,12 +128,12 @@ work within the environment. Now we can run `asv`.
 [50.00%] ··· Running (benchmarks.time_ranges_multi--).
 [100.00%] ··· benchmarks.time_ranges_multi                                                                                                                                                                         ok
 [100.00%] ··· ===== ========= =============
-              --           func_name       
+              --           func_name
               ----- -----------------------
-                n     range       arange   
+                n     range       arange
               ===== ========= =============
-                10   324±2ns     1.09±0μs  
-               100   729±4ns   3.25±0.03μs 
+                10   324±2ns     1.09±0μs
+               100   729±4ns   3.25±0.03μs
               ===== ========= =============
 ```
 
@@ -143,7 +143,7 @@ results file, and therefore are not going to be relevant here.
 With the results files in place, it is now trivial to compare the results across environments.
 
 ``` sh
-asv-spyglass compare .asv/results/rgx1gen11/*.tmp_1* .asv/results/rgx1gen11/*.tmp_2* .asv/results/benchmarks.json 
+asv-spyglass compare .asv/results/rgx1gen11/*.tmp_1* .asv/results/rgx1gen11/*.tmp_2* .asv/results/benchmarks.json
 | Change   | Before      | After       |   Ratio | Benchmark (Parameter)                                                                                                                                                                                                                          |
 |----------|-------------|-------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 |          | 1.09±0μs    | 1.12±0μs    |    1.03 | benchmarks.time_ranges_multi(10, 'arange') [rgx1gen11/existing-py_home_asv_samples_.tmp_1_bin_python -> rgx1gen11/existing-py_home_asv_samples_.tmp_2_bin_python]  |
