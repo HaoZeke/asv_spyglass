@@ -88,16 +88,11 @@ class PreparedResult:
                 **stats_dict,  # Expand the stats dictionary
                 "samples": samples,
             }
-            # row.update(dict(zip(["param_" + str(i) for i in range(len(params))], params)))
-            # row.update(dict(zip(self.param_names[key], params)))
-            # Combine numeric index and parameter name for column names
+            # Combine param and parameter name for column names
             row.update(
                 dict(
                     zip(
-                        [
-                            f"param_{i}_{name}"
-                            for i, name in enumerate(self.param_names[key])
-                        ],
+                        [f"param_{name}" for name in self.param_names[key]],
                         params,
                     )
                 )
