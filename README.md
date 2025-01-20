@@ -45,23 +45,29 @@ inspection.
 ``` sh
 ➜ asv-spyglass to-df tests/data/d6b286b8-rattler-py3.12-numpy.json tests/data/d6b286b8_asv_samples_benchmarks.json
 shape: (16, 17)
-┌─────────────────────────────────┬─────────────────────────────────┬───────────┬─────────┬───┬─────────┬────────────┬─────────┬─────────────────┐
-│ benchmark_base                  ┆ name                            ┆ result    ┆ units   ┆ … ┆ samples ┆ param_size ┆ param_n ┆ param_func_name │
-│ ---                             ┆ ---                             ┆ ---       ┆ ---     ┆   ┆ ---     ┆ ---        ┆ ---     ┆ ---             │
-│ str                             ┆ str                             ┆ f64       ┆ str     ┆   ┆ null    ┆ str        ┆ str     ┆ str             │
-╞═════════════════════════════════╪═════════════════════════════════╪═══════════╪═════════╪═══╪═════════╪════════════╪═════════╪═════════════════╡
-│ benchmarks.TimeSuiteDecoratorS… ┆ benchmarks.TimeSuiteDecoratorS… ┆ 1.3738e-7 ┆ seconds ┆ … ┆ null    ┆ 10         ┆ null    ┆ null            │
-│ benchmarks.TimeSuiteDecoratorS… ┆ benchmarks.TimeSuiteDecoratorS… ┆ 5.4292e-7 ┆ seconds ┆ … ┆ null    ┆ 100        ┆ null    ┆ null            │
-│ benchmarks.TimeSuiteDecoratorS… ┆ benchmarks.TimeSuiteDecoratorS… ┆ 0.000001  ┆ seconds ┆ … ┆ null    ┆ 200        ┆ null    ┆ null            │
-│ benchmarks.TimeSuiteDecoratorS… ┆ benchmarks.TimeSuiteDecoratorS… ┆ 1.8705e-7 ┆ seconds ┆ … ┆ null    ┆ 10         ┆ null    ┆ null            │
-│ benchmarks.TimeSuiteDecoratorS… ┆ benchmarks.TimeSuiteDecoratorS… ┆ 7.8471e-7 ┆ seconds ┆ … ┆ null    ┆ 100        ┆ null    ┆ null            │
-│ …                               ┆ …                               ┆ …         ┆ …       ┆ … ┆ …       ┆ …          ┆ …       ┆ …               │
-│ benchmarks.time_ranges_multi    ┆ benchmarks.time_ranges_multi(1… ┆ 0.000001  ┆ seconds ┆ … ┆ null    ┆ null       ┆ 10      ┆ 'arange'        │
-│ benchmarks.time_ranges_multi    ┆ benchmarks.time_ranges_multi(1… ┆ 4.3222e-7 ┆ seconds ┆ … ┆ null    ┆ null       ┆ 100     ┆ 'range'         │
-│ benchmarks.time_ranges_multi    ┆ benchmarks.time_ranges_multi(1… ┆ 0.000003  ┆ seconds ┆ … ┆ null    ┆ null       ┆ 100     ┆ 'arange'        │
-│ benchmarks.time_sort            ┆ benchmarks.time_sort(10)        ┆ 0.000001  ┆ seconds ┆ … ┆ null    ┆ null       ┆ 10      ┆ null            │
-│ benchmarks.time_sort            ┆ benchmarks.time_sort(100)       ┆ 0.000002  ┆ seconds ┆ … ┆ null    ┆ null       ┆ 100     ┆ null            │
-└─────────────────────────────────┴─────────────────────────────────┴───────────┴─────────┴───┴─────────┴────────────┴─────────┴─────────────────┘
+| benchmark_base                 | name                           | result    | units   | machine   | env                  | version                       | ci_99_a   | ci_99_b   | q_25      | q_75      | number | repeat | samples | param_size | param_n | param_func_name |
+|--------------------------------|--------------------------------|-----------|---------|-----------|----------------------|-------------------------------|-----------|-----------|-----------|-----------|--------|--------|---------|------------|---------|-----------------|
+| benchmarks.TimeSuiteDecoratorS | benchmarks.TimeSuiteDecoratorS | 1.3738e-7 | seconds | rgx1gen11 | rattler-py3.12-numpy | 64746c9051ff76aa879b428c27b42 | 1.3444e-7 | 1.4947e-7 | 1.3621e-7 | 1.4310e-7 | 67364  | 10     | null    | 10         | null    | null            |
+| ingle.time_keys                | ingle.time_keys(10)            |           |         |           |                      | 47e8ed976c44a40579ae9...      |           |           |           |           |        |        |         |            |         |                 |
+| benchmarks.TimeSuiteDecoratorS | benchmarks.TimeSuiteDecoratorS | 5.4292e-7 | seconds | rgx1gen11 | rattler-py3.12-numpy | 64746c9051ff76aa879b428c27b42 | 5.3813e-7 | 5.4586e-7 | 5.4190e-7 | 5.4495e-7 | 16815  | 10     | null    | 100        | null    | null            |
+| ingle.time_keys                | ingle.time_keys(100)           |           |         |           |                      | 47e8ed976c44a40579ae9...      |           |           |           |           |        |        |         |            |         |                 |
+| benchmarks.TimeSuiteDecoratorS | benchmarks.TimeSuiteDecoratorS | 0.000001  | seconds | rgx1gen11 | rattler-py3.12-numpy | 64746c9051ff76aa879b428c27b42 | 0.000001  | 0.000001  | 0.000001  | 0.000001  | 8960   | 10     | null    | 200        | null    | null            |
+| ingle.time_keys                | ingle.time_keys(200)           |           |         |           |                      | 47e8ed976c44a40579ae9...      |           |           |           |           |        |        |         |            |         |                 |
+| benchmarks.TimeSuiteDecoratorS | benchmarks.TimeSuiteDecoratorS | 1.8705e-7 | seconds | rgx1gen11 | rattler-py3.12-numpy | ab162b6142a1390a0e2a667ed8d2d | 1.8023e-7 | 1.9282e-7 | 1.8595e-7 | 1.9121e-7 | 63961  | 10     | null    | 10         | null    | null            |
+| ingle.time_values              | ingle.time_values(10...        |           |         |           |                      | 3285f77152d9caa559b4f...      |           |           |           |           |        |        |         |            |         |                 |
+| benchmarks.TimeSuiteDecoratorS | benchmarks.TimeSuiteDecoratorS | 7.8471e-7 | seconds | rgx1gen11 | rattler-py3.12-numpy | ab162b6142a1390a0e2a667ed8d2d | 7.7445e-7 | 7.9307e-7 | 7.8003e-7 | 7.8758e-7 | 15516  | 10     | null    | 100        | null    | null            |
+| ingle.time_values              | ingle.time_values(10...        |           |         |           |                      | 3285f77152d9caa559b4f...      |           |           |           |           |        |        |         |            |         |                 |
+| ...                            | ...                            | ...       | ...     | ...       | ...                  | ...                           | ...       | ...       | ...       | ...       | ...    | ...    | ...     | ...        | ...     | ...             |
+| benchmarks.time_ranges_multi   | benchmarks.time_ranges_multi(1 | 0.000001  | seconds | rgx1gen11 | rattler-py3.12-numpy | f9ae8b134446c273c0d3eb1e90246 | 0.000001  | 0.000001  | 0.000001  | 0.000001  | 9631   | 10     | null    | null       | 10      | 'arange'        |
+|                                | 0, 'arange')                   |           |         |           |                      | ae0d6f99389d06119dfe4...      |           |           |           |           |        |        |         |            |         |                 |
+| benchmarks.time_ranges_multi   | benchmarks.time_ranges_multi(1 | 4.3222e-7 | seconds | rgx1gen11 | rattler-py3.12-numpy | f9ae8b134446c273c0d3eb1e90246 | 4.3157e-7 | 4.3557e-7 | 4.3176e-7 | 4.3420e-7 | 20588  | 10     | null    | null       | 100     | 'range'         |
+|                                | 00, 'range')                   |           |         |           |                      | ae0d6f99389d06119dfe4...      |           |           |           |           |        |        |         |            |         |                 |
+| benchmarks.time_ranges_multi   | benchmarks.time_ranges_multi(1 | 0.000003  | seconds | rgx1gen11 | rattler-py3.12-numpy | f9ae8b134446c273c0d3eb1e90246 | 0.000003  | 0.000003  | 0.000003  | 0.000003  | 3042   | 10     | null    | null       | 100     | 'arange'        |
+|                                | 00, 'arange')                  |           |         |           |                      | ae0d6f99389d06119dfe4...      |           |           |           |           |        |        |         |            |         |                 |
+| benchmarks.time_sort           | benchmarks.time_sort(10)       | 0.000001  | seconds | rgx1gen11 | rattler-py3.12-numpy | 60785bf757da0254d857b696482db | 0.000001  | 0.000001  | 0.000001  | 0.000001  | 9345   | 10     | null    | null       | 10      | null            |
+|                                |                                |           |         |           |                      | 7a25509a5b28a2c9d2a54...      |           |           |           |           |        |        |         |            |         |                 |
+| benchmarks.time_sort           | benchmarks.time_sort(100)      | 0.000002  | seconds | rgx1gen11 | rattler-py3.12-numpy | 60785bf757da0254d857b696482db | 0.000002  | 0.000002  | 0.000002  | 0.000002  | 5828   | 10     | null    | null       | 100     | null            |
+|                                |                                |           |         |           |                      | 7a25509a5b28a2c9d2a54...      |           |           |           |           |        |        |         |            |         |                 |
 ```
 
 

@@ -2,6 +2,7 @@ from pathlib import Path
 
 import click
 from asv import results
+import polars as pl
 
 from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
 from asv_spyglass._aux import getstrform
@@ -69,4 +70,10 @@ def to_df(bres, bdat, csv):
     if csv:
         df.to_csv(csv)
     else:
-        click.echo(df)
+        with pl.Config(
+            tbl_formatting="ASCII_MARKDOWN",
+            tbl_hide_column_data_types=True,
+                fmt_str_lengths=50,
+                tbl_cols=50,
+        ):
+            click.echo(df)
