@@ -180,3 +180,11 @@ pipx run pre-commit run --all-files
 # Or install the git hook to enforce this
 pipx run pre-commit install
 ```
+
+
+# History
+
+> Why another CLI instead of being in `asv`?
+
+I didn't want to handle the `argparse` oriented CLI in `asv`. That being said
+this will be under the `airspeed-velocity` organization..
