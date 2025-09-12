@@ -1,8 +1,6 @@
 import itertools
-import json
 import re
 from pathlib import Path
-from typing import Iterator, Union
 
 from asv.util import load_json as asv_json_load
 
@@ -14,7 +12,7 @@ class ReadOnlyASVBenchmarks:
 
     api_version = 2
 
-    def __init__(self, benchmarks_file: Path, regex: Union[str, list[str]] = None):
+    def __init__(self, benchmarks_file: Path, regex: str | list[str] = None):
         """
         Initialize and load benchmarks from a JSON file, optionally filtering them.
 
@@ -35,11 +33,10 @@ class ReadOnlyASVBenchmarks:
 
         for benchmark in d.values():
             self._base_benchmarks[benchmark["name"]] = benchmark
-            if benchmark["params"]:
+            if benchmark.get("params"):
                 self._benchmark_selection[benchmark["name"]] = []
-                for idx, param_set in enumerate(
-                    itertools.product(*benchmark["params"])
-                ):
+                param_tuples = [tuple(map(str, p)) for p in benchmark["params"]]
+                for idx, param_set in enumerate(itertools.product(*param_tuples)):
                     name = f"{benchmark['name']}({', '.join(param_set)})"
                     if not regex or any(re.search(reg, name) for reg in regex):
                         self.filtered_benchmarks[name] = (
