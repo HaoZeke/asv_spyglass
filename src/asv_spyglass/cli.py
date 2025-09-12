@@ -5,7 +5,6 @@ import polars as pl
 from asv import results
 
 from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
-from asv_spyglass._aux import getstrform
 from asv_spyglass.compare import ResultPreparer, do_compare
 
 
@@ -20,7 +19,7 @@ def cli():
 @cli.command()
 @click.argument("b1", type=click.Path(exists=True), required=True)
 @click.argument("b2", type=click.Path(exists=True), required=True)
-@click.argument("bconf", type=click.Path(exists=True), required=True)
+@click.argument("bconf", type=click.Path(exists=True), required=False)
 @click.option(
     "--factor",
     default=1.1,
@@ -48,6 +47,16 @@ def compare(b1, b2, bconf, factor, split, only_changed, sort):  # Renamed to 'co
     """
     Compare two ASV result files.
     """
+    if not bconf:
+        bconf_path = Path(b1).parent.parent / "benchmarks.json"
+        if bconf_path.exists():
+            bconf = str(bconf_path)
+        else:
+            raise click.UsageError(
+                "Error: Missing argument 'BCONF'. Could not find 'benchmarks.json' automatically. "
+                "Please provide the path to your benchmarks.json file."
+            )
+
     print(do_compare(b1, b2, bconf, factor, split, only_changed, sort))
 
 
@@ -68,7 +77,7 @@ def to_df(bres, bdat, csv):
     preparer = ResultPreparer(benchdat)
     df = preparer.prepare(res).to_df()
     if csv:
-        df.to_csv(csv)
+        df.write_csv(csv)
     else:
         with pl.Config(
             tbl_formatting="ASCII_MARKDOWN",
