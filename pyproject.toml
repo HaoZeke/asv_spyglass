@@ -5,7 +5,7 @@ description = "File oriented ASV benchmark comparer"
 authors = [
     {name = "Rohit Goswami", email = "rgoswami@ieee.org"},
 ]
-dependencies = ["asv @ git+https://github.com/airspeed-velocity/asv/", "click>=8.1.8", "asv-runner>=0.2.1", "polars>=1.20.0"]
+dependencies = ["asv>=0.6.5", "click>=8.1.8", "asv-runner>=0.2.1", "polars>=1.20.0"]
 requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "MIT"}
