@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: prefix-dev/setup-pixi@v0.8.1
         with:
           cache: true
@@ -19,15 +21,14 @@ jobs:
       - name: Install dependencies
         shell: pixi run bash -e {0}
         run: |
-          pdm install -G:all
+          uv pip install -e ".[test]"
 
       - name: Test package
         shell: pixi run bash -e {0}
         run: |
-          pdm run pytest
-          pdm build
+          pytest
 
       - name: Build package
         shell: pixi run bash -e {0}
         run: |
-          pdm build
+          uv build

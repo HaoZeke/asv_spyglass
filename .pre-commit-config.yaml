@@ -19,7 +19,3 @@ repos:
         args: ["--select", "I", "--fix"]
     - id: ruff-format # Format
       name: ruff-lint
-- repo: https://github.com/pdm-project/pdm
-  rev: 2.22.2
-  hooks:
-    - id: pdm-lock-check

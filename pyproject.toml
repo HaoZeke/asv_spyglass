@@ -1,6 +1,6 @@
 [project]
 name = "asv_spyglass"
-version = "0.1.0"
+dynamic = ["version"]
 description = "File oriented ASV benchmark comparer"
 authors = [
     {name = "Rohit Goswami", email = "rgoswami@ieee.org"},
@@ -24,12 +24,14 @@ test = [
     "pytest-datadir>=1.5.0",
 ]
 [build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
+[tool.hatch.version]
+source = "vcs"
 
-[tool.pdm]
-distribution = true
+[tool.hatch.build.hooks.vcs]
+version-file = "src/asv_spyglass/_version.py"
 
 [project.scripts]
 asv-spyglass = "asv_spyglass.cli:cli"
