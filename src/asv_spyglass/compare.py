@@ -3,11 +3,14 @@ from __future__ import annotations
 from pathlib import Path
 
 import tabulate
-from asv import results
-from asv.commands.compare import _is_result_better, unroll_result
-from asv.console import log
-from asv.util import human_value
-from asv_runner.console import color_print
+from asv import results  # type: ignore[import-untyped]
+from asv.commands.compare import (  # type: ignore[import-untyped]
+    _is_result_better,
+    unroll_result,
+)
+from asv.console import log  # type: ignore[import-untyped]
+from asv.util import human_value  # type: ignore[import-untyped]
+from asv_runner.console import color_print  # type: ignore[import-untyped]
 
 from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
 from asv_spyglass._num import Ratio

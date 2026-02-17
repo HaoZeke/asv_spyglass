@@ -2,7 +2,7 @@ import itertools
 import re
 from pathlib import Path
 
-from asv.util import load_json as asv_json_load
+from asv.util import load_json as asv_json_load  # type: ignore[import-untyped]
 
 from asv_spyglass._aux import getstrform
 
@@ -16,7 +16,7 @@ class ReadOnlyASVBenchmarks:
         """Load benchmarks from a JSON file, optionally filtering by regex."""
         d = asv_json_load(getstrform(benchmarks_file), api_version=self.api_version)
         self._base_benchmarks = {}  # Store all benchmarks here
-        self._benchmark_selection = {}  # Track selected parameter combinations
+        self._benchmark_selection: dict[str, list[int]] = {}
         self.filtered_benchmarks = {}  # Store selected benchmarks here after parameter expansion
 
         if not regex:
@@ -37,7 +37,7 @@ class ReadOnlyASVBenchmarks:
                         )
                         self._benchmark_selection[benchmark["name"]].append(idx)
             else:
-                self._benchmark_selection[benchmark["name"]] = None
+                self._benchmark_selection[benchmark["name"]] = []
                 if not regex or any(re.search(reg, benchmark["name"]) for reg in regex):
                     self.filtered_benchmarks[benchmark["name"]] = benchmark
 

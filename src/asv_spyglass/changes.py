@@ -6,7 +6,10 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Callable
 
-from asv.commands.compare import _is_result_better, _isna
+from asv.commands.compare import (  # type: ignore[import-untyped]
+    _is_result_better,
+    _isna,
+)
 
 from asv_spyglass._num import Ratio
 from asv_spyglass.results import ASVBench

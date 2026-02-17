@@ -6,9 +6,7 @@ import re
 from collections import namedtuple
 
 import polars as pl
-from asv import results
-
-from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
+from asv import results  # type: ignore[import-untyped]
 
 ASVResult = namedtuple(
     "ASVResult",
