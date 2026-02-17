@@ -1,50 +1,32 @@
-import math
+from __future__ import annotations
+
 from pathlib import Path
 
 import tabulate
 from asv import results
-from asv.commands.compare import _is_result_better, _isna, unroll_result
+from asv.commands.compare import _is_result_better, unroll_result
 from asv.console import log
 from asv.util import human_value
 from asv_runner.console import color_print
-from asv_runner.statistics import get_err
 
 from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
-from asv_spyglass.results import PreparedResult, result_iter
+from asv_spyglass._num import Ratio
+from asv_spyglass.changes import get_change_info
+from asv_spyglass.results import ASVBench, PreparedResult, result_iter
 
 
 class ResultPreparer:
-    """
-    Prepares benchmark results for comparison by extracting relevant data
-    like units, values, stats, versions, and machine/environment names.
-    """
+    """Prepares benchmark results for comparison."""
 
     def __init__(self, benchmarks):
-        """
-        Initializes ResultPreparer with benchmark data.
-
-        Args:
-            benchmarks: Benchmark data used for extracting units.
-        """
         self.benchmarks = benchmarks
 
-    def prepare(self, result_data):
-        """
-        Processes result data and returns extracted information.
-
-        Args:
-            result_data: Result data to be processed.
-
-        Returns:
-            tuple: A tuple containing units, results, stats, versions,
-                   and the machine/environment name.
-        """
+    def prepare(self, result_data) -> PreparedResult:
         units = {}
-        results = {}
+        result_vals = {}
         ss = {}
         versions = {}
         param_names = {}
-        btype = {}
         machine_env_name = None
 
         for (
@@ -61,16 +43,11 @@ class ResultPreparer:
             for name, value, stats, samples in unroll_result(
                 key, params, value, stats, samples
             ):
-                results[name] = value
-                # TODO(hz): Split samples out later when _is_result_better is
-                # not used anymore, currently in a tuple for ASV compatibility
+                result_vals[name] = value
                 ss[name] = (stats, samples)
                 versions[name] = version
-                # HACK(hz): The names already include the parameters i.e.
-                # benchmark(param) so this works around the situation
                 bench_key = [x for x in self.benchmarks.keys() if key in x][0]
                 units[name] = self.benchmarks.get(bench_key, {}).get("unit")
-                btype[name] = self.benchmarks.get(bench_key, {}).get("type")
                 param_names[name] = self.benchmarks.get(bench_key, {}).get(
                     "param_names"
                 )
@@ -78,7 +55,7 @@ class ResultPreparer:
         machine, env_name = machine_env_name.split("/")
         return PreparedResult(
             units=units,
-            results=results,
+            results=result_vals,
             stats=ss,
             versions=versions,
             machine_name=machine,
@@ -88,170 +65,94 @@ class ResultPreparer:
 
 
 def do_compare(
-    b1,
-    b2,
-    bdat,
-    factor=1.1,
-    split=False,
-    only_changed=False,
-    sort="default",
-    machine=None,
-    env_spec=None,
-    use_stats=True,
-    label_before=None,
-    label_after=None,
-    no_env_label=False,
-    only_improved=False,
-    only_regressed=False,
-):
-    # Load results
-    res_1 = results.Results.load(b1)
-    res_2 = results.Results.load(b2)
+    result_before: str,
+    result_after: str,
+    benchmarks_path: str | Path,
+    factor: float = 1.1,
+    split: bool = False,
+    only_changed: bool = False,
+    sort: str = "default",
+    use_stats: bool = True,
+    label_before: str | None = None,
+    label_after: str | None = None,
+    no_env_label: bool = False,
+    only_improved: bool = False,
+    only_regressed: bool = False,
+) -> tuple[str, bool, bool]:
+    """Compare two ASV result files.
 
-    # Initialize benchmarks
-    benchmarks = ReadOnlyASVBenchmarks(Path(bdat)).benchmarks
+    Returns:
+        (table_output, has_regressions, has_improvements)
+    """
+    res_1 = results.Results.load(result_before)
+    res_2 = results.Results.load(result_after)
 
-    # Prepare results using the ResultPreparer class
+    benchmarks = ReadOnlyASVBenchmarks(Path(benchmarks_path)).benchmarks
+
     preparer = ResultPreparer(benchmarks)
-    prepared_results_1 = preparer.prepare(res_1)
-    prepared_results_2 = preparer.prepare(res_2)
-    # Kanged from compare.py
+    prepared_1 = preparer.prepare(res_1)
+    prepared_2 = preparer.prepare(res_2)
 
-    # Extract data from prepared results
-    results_1 = prepared_results_1.results
-    results_2 = prepared_results_2.results
-    ss_1 = prepared_results_1.stats
-    ss_2 = prepared_results_2.stats
-    versions_1 = prepared_results_1.versions
-    versions_2 = prepared_results_2.versions
-    units = prepared_results_1.units
+    mname_1 = f"{prepared_1.machine_name}/{prepared_1.env_name}"
+    mname_2 = f"{prepared_2.machine_name}/{prepared_2.env_name}"
+    machine_env_names = {mname_1, mname_2}
 
-    machine_env_names = set()
-    mname_1 = f"{prepared_results_1.machine_name}/{prepared_results_1.env_name}"
-    mname_2 = f"{prepared_results_2.machine_name}/{prepared_results_2.env_name}"
-    machine_env_names.add(mname_1)
-    machine_env_names.add(mname_2)
-
-    benchmarks_1 = set(results_1.keys())
-    benchmarks_2 = set(results_2.keys())
-    joint_benchmarks = sorted(list(benchmarks_1 | benchmarks_2))
-    bench = {}
+    joint_benchmarks = sorted(
+        set(prepared_1.results.keys()) | set(prepared_2.results.keys())
+    )
 
     if split:
-        bench["green"] = []
-        bench["red"] = []
-        bench["lightgrey"] = []
-        bench["default"] = []
+        bench = {"green": [], "red": [], "lightgrey": [], "default": []}
     else:
-        bench["all"] = []
+        bench = {"all": []}
 
     worsened = False
     improved = False
 
     for benchmark in joint_benchmarks:
-        if benchmark in results_1:
-            time_1 = results_1[benchmark]
-        else:
-            time_1 = math.nan
+        asv1 = ASVBench.from_prepared_result(benchmark, prepared_1)
+        asv2 = ASVBench.from_prepared_result(benchmark, prepared_2)
 
-        if benchmark in results_2:
-            time_2 = results_2[benchmark]
-        else:
-            time_2 = math.nan
+        ratio = Ratio(t1=asv1.time, t2=asv2.time)
 
-        if benchmark in ss_1 and ss_1[benchmark][0]:
-            err_1 = get_err(time_1, ss_1[benchmark][0])
-        else:
-            err_1 = None
+        info = get_change_info(asv1, asv2, factor, use_stats)
+        color = info.color.value
+        mark = info.mark.value
 
-        if benchmark in ss_2 and ss_2[benchmark][0]:
-            err_2 = get_err(time_2, ss_2[benchmark][0])
-        else:
-            err_2 = None
+        if info.is_worsened:
+            worsened = True
+        if info.is_improved:
+            improved = True
 
-        version_1 = versions_1.get(benchmark)
-        version_2 = versions_2.get(benchmark)
+        # Mark statistically insignificant results
+        if info.after_is.value == "same" and not ratio.is_na:
+            if _is_result_better(
+                asv1.time, asv2.time, None, None, factor
+            ) or _is_result_better(asv2.time, asv1.time, None, None, factor):
+                ratio = Ratio(
+                    t1=asv1.time, t2=asv2.time, is_insignificant=True
+                )
 
-        if _isna(time_1) or _isna(time_2):
-            ratio = "n/a"
+        if ratio.is_na:
+            ratio_str = "n/a"
             ratio_num = 1e9
         else:
-            try:
-                ratio_num = time_2 / time_1
-                ratio = f"{ratio_num:6.2f}"
-            except ZeroDivisionError:
-                ratio_num = 1e9
-                ratio = "n/a"
-
-        if version_1 is not None and version_2 is not None and version_1 != version_2:
-            # not comparable
-            color = "lightgrey"
-            mark = "x"
-        elif time_1 is not None and time_2 is None:
-            # introduced a failure
-            color = "red"
-            mark = "!"
-            worsened = True
-        elif time_1 is None and time_2 is not None:
-            # fixed a failure
-            color = "green"
-            mark = " "
-            improved = True
-        elif time_1 is None and time_2 is None:
-            # both failed
-            color = "default"
-            mark = " "
-        elif _isna(time_1) or _isna(time_2):
-            # either one was skipped
-            color = "default"
-            mark = " "
-        elif _is_result_better(
-            time_2,
-            time_1,
-            ss_2.get(benchmark),
-            ss_1.get(benchmark),
-            factor,
-            use_stats=use_stats,
-        ):
-            color = "green"
-            mark = "-"
-            improved = True
-        elif _is_result_better(
-            time_1,
-            time_2,
-            ss_1.get(benchmark),
-            ss_2.get(benchmark),
-            factor,
-            use_stats=use_stats,
-        ):
-            color = "red"
-            mark = "+"
-            worsened = True
-        else:
-            color = "default"
-            mark = " "
-
-            # Mark statistically insignificant results
-            if _is_result_better(
-                time_1, time_2, None, None, factor
-            ) or _is_result_better(time_2, time_1, None, None, factor):
-                ratio = "~" + ratio.strip()
+            ratio_num = ratio.val
+            ratio_str = repr(ratio) if ratio.is_insignificant else f"{ratio.val:6.2f}"
 
         if only_changed and mark in (" ", "x"):
             continue
-
         if only_improved and color != "green":
             continue
-
         if only_regressed and color != "red":
             continue
 
-        unit = units[benchmark]
+        unit = asv1.unit or asv2.unit
 
         details = (
-            f"{mark:1s} {human_value(time_1, unit, err=err_1):>15s}"
-            f"  {human_value(time_2, unit, err=err_2):>15s}"
-            f" {ratio:>8s}  "
+            f"{mark:1s} {human_value(asv1.time, unit, err=asv1.err):>15s}"
+            f"  {human_value(asv2.time, unit, err=asv2.err):>15s}"
+            f" {ratio_str:>8s}  "
         )
         split_line = details.split()
         if no_env_label or len(machine_env_names) <= 1:
@@ -276,21 +177,19 @@ def do_compare(
     else:
         keys = ["all"]
 
-    titles = {}
-    titles["green"] = "Benchmarks that have improved:"
-    titles["default"] = "Benchmarks that have stayed the same:"
-    titles["red"] = "Benchmarks that have got worse:"
-    titles["lightgrey"] = "Benchmarks that are not comparable:"
-    titles["all"] = "All benchmarks:"
+    titles = {
+        "green": "Benchmarks that have improved:",
+        "default": "Benchmarks that have stayed the same:",
+        "red": "Benchmarks that have got worse:",
+        "lightgrey": "Benchmarks that are not comparable:",
+        "all": "All benchmarks:",
+    }
 
     log.flush()
 
-    name_1 = ""  # commit_names.get(hash_1)
-    name_2 = ""  # commit_names.get(hash_2)
-
     sections = []
     for key in keys:
-        if len(bench[key]) == 0:
+        if not bench[key]:
             continue
 
         if sort == "default":
@@ -306,8 +205,8 @@ def do_compare(
             bench[key],
             headers=[
                 "Change",
-                f"Before {name_1}",
-                f"After {name_2}",
+                "Before",
+                "After",
                 "Ratio",
                 "Benchmark (Parameter)",
             ],
