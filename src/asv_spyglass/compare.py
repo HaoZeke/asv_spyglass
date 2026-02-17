@@ -272,26 +272,13 @@ def do_compare(
 
     log.flush()
 
+    name_1 = ""  # commit_names.get(hash_1)
+    name_2 = ""  # commit_names.get(hash_2)
+
+    sections = []
     for key in keys:
         if len(bench[key]) == 0:
             continue
-
-        if not only_changed:
-            color_print("")
-            color_print(titles[key])
-            color_print("")
-
-        name_1 = False  # commit_names.get(hash_1)
-        if name_1:
-            name_1 = f"<{name_1}>"
-        else:
-            name_1 = ""
-
-        name_2 = False  # commit_names.get(hash_2)
-        if name_2:
-            name_2 = f"<{name_2}>"
-        else:
-            name_2 = ""
 
         if sort == "default":
             pass
@@ -302,18 +289,23 @@ def do_compare(
         else:
             raise ValueError("Unknown 'sort'")
 
-        return (
-            tabulate.tabulate(
-                bench[key],
-                headers=[
-                    "Change",
-                    f"Before {name_1}",
-                    f"After {name_2}",
-                    "Ratio",
-                    "Benchmark (Parameter)",
-                ],
-                tablefmt="github",
-            ),
-            worsened,
-            improved,
+        table = tabulate.tabulate(
+            bench[key],
+            headers=[
+                "Change",
+                f"Before {name_1}",
+                f"After {name_2}",
+                "Ratio",
+                "Benchmark (Parameter)",
+            ],
+            tablefmt="github",
         )
+
+        if not only_changed:
+            color_print("")
+            color_print(titles[key])
+            color_print("")
+
+        sections.append(table)
+
+    return "\n\n".join(sections), worsened, improved

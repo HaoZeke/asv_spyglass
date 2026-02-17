@@ -28,6 +28,17 @@ def test_do_compare(shared_datadir):
     verify(output)
 
 
+def test_do_compare_split(shared_datadir):
+    """--split returns all non-empty sections (GH-13)."""
+    result, _, _ = do_compare(
+        getstrform(shared_datadir / "d6b286b8-virtualenv-py3.12-numpy.json"),
+        getstrform(shared_datadir / "d6b286b8-rattler-py3.12-numpy.json"),
+        shared_datadir / "d6b286b8_asv_samples_benchmarks.json",
+        split=True,
+    )
+    verify(result)
+
+
 def test_result_df(shared_datadir):
     res = results.Results.load(
         getstrform(shared_datadir / "d6b286b8-rattler-py3.12-numpy.json")
