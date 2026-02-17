@@ -1,0 +1,24 @@
+| Change   | Before      | After       |   Ratio | Benchmark (Parameter)                                                                                                    |
+|----------|-------------|-------------|---------|--------------------------------------------------------------------------------------------------------------------------|
+| -        | 157±3ns     | 137±3ns     |    0.87 | benchmarks.TimeSuiteDecoratorSingle.time_keys(10) [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]  |
+| -        | 643±2ns     | 543±2ns     |    0.84 | benchmarks.TimeSuiteDecoratorSingle.time_keys(100) [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy] |
+| -        | 196±1ns     | 176±1ns     |    0.9  | benchmarks.time_ranges_multi(10, 'range') [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]          |
+| -        | 532±1ns     | 432±1ns     |    0.81 | benchmarks.time_ranges_multi(100, 'range') [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]         |
+| -        | 1.83±0.01μs | 1.63±0.01μs |    0.89 | benchmarks.time_sort(100) [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]                          |
+
+| Change   | Before      | After       |   Ratio | Benchmark (Parameter)                                                                                                             |
+|----------|-------------|-------------|---------|-----------------------------------------------------------------------------------------------------------------------------------|
+|          | 1.17±0μs    | 1.07±0μs    |    0.91 | benchmarks.TimeSuiteDecoratorSingle.time_keys(200) [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]          |
+|          | 211±0.9ns   | 231±0.9ns   |    1.09 | benchmarks.TimeSuiteMultiDecorator.time_ranges(10, 'range') [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy] |
+|          | 1.14±0μs    | 1.04±0μs    |    0.91 | benchmarks.time_ranges_multi(10, 'arange') [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]                  |
+|          | 3.39±0.03μs | 3.09±0.03μs |    0.91 | benchmarks.time_ranges_multi(100, 'arange') [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]                 |
+|          | 1.18±0μs    | 1.08±0μs    |    0.91 | benchmarks.time_sort(10) [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]                                    |
+
+| Change   | Before      | After       |   Ratio | Benchmark (Parameter)                                                                                                               |
+|----------|-------------|-------------|---------|-------------------------------------------------------------------------------------------------------------------------------------|
+| +        | 167±3ns     | 187±3ns     |    1.12 | benchmarks.TimeSuiteDecoratorSingle.time_values(10) [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]           |
+| +        | 685±4ns     | 785±4ns     |    1.15 | benchmarks.TimeSuiteDecoratorSingle.time_values(100) [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]          |
+| +        | 1.26±0μs    | 1.46±0μs    |    1.16 | benchmarks.TimeSuiteDecoratorSingle.time_values(200) [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]          |
+| +        | 1.17±0.01μs | 1.37±0.01μs |    1.17 | benchmarks.TimeSuiteMultiDecorator.time_ranges(10, 'arange') [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]  |
+| +        | 3.43±0.02μs | 3.83±0.02μs |    1.12 | benchmarks.TimeSuiteMultiDecorator.time_ranges(100, 'arange') [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy] |
+| +        | 551±1ns     | 651±1ns     |    1.18 | benchmarks.TimeSuiteMultiDecorator.time_ranges(100, 'range') [rgx1gen11/virtualenv-py3.12-numpy -> rgx1gen11/rattler-py3.12-numpy]  |

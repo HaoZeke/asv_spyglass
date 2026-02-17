@@ -43,7 +43,33 @@ def cli():
     show_default=True,
     help="Sort output by change, ratio, or name.",
 )
-def compare(b1, b2, bconf, factor, split, only_changed, sort):  # Renamed to 'compare'
+@click.option(
+    "--label-before",
+    default=None,
+    help="Custom label for the 'before' environment.",
+)
+@click.option(
+    "--label-after",
+    default=None,
+    help="Custom label for the 'after' environment.",
+)
+@click.option(
+    "--no-env-label",
+    is_flag=True,
+    help="Suppress the [machine/env -> machine/env] suffix.",
+)
+def compare(
+    b1,
+    b2,
+    bconf,
+    factor,
+    split,
+    only_changed,
+    sort,
+    label_before,
+    label_after,
+    no_env_label,
+):
     """
     Compare two ASV result files.
     """
@@ -53,11 +79,29 @@ def compare(b1, b2, bconf, factor, split, only_changed, sort):  # Renamed to 'co
             bconf = str(bconf_path)
         else:
             raise click.UsageError(
-                "Error: Missing argument 'BCONF'. Could not find 'benchmarks.json' automatically. "
-                "Please provide the path to your benchmarks.json file."
+                "Error: Missing argument 'BCONF'. "
+                "Could not find 'benchmarks.json' "
+                "automatically. Please provide the "
+                "path to your benchmarks.json file."
             )
 
-    print(do_compare(b1, b2, bconf, factor, split, only_changed, sort))
+    import sys
+
+    output, worsened, _ = do_compare(
+        b1,
+        b2,
+        bconf,
+        factor,
+        split,
+        only_changed,
+        sort,
+        label_before=label_before,
+        label_after=label_after,
+        no_env_label=no_env_label,
+    )
+    print(output)
+    if worsened:
+        sys.exit(1)
 
 
 @cli.command()

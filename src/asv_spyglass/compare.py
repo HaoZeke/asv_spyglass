@@ -1,7 +1,6 @@
 import math
 from pathlib import Path
 
-import polars as pl
 import tabulate
 from asv import results
 from asv.commands.compare import _is_result_better, _isna, unroll_result
@@ -99,6 +98,9 @@ def do_compare(
     machine=None,
     env_spec=None,
     use_stats=True,
+    label_before=None,
+    label_after=None,
+    no_env_label=False,
 ):
     # Load results
     res_1 = results.Results.load(b1)
@@ -238,17 +240,20 @@ def do_compare(
 
         unit = units[benchmark]
 
-        details = "{0:1s} {1:>15s}  {2:>15s} {3:>8s}  ".format(
-            mark,
-            human_value(time_1, unit, err=err_1),
-            human_value(time_2, unit, err=err_2),
-            ratio,
+        details = (
+            f"{mark:1s} {human_value(time_1, unit, err=err_1):>15s}"
+            f"  {human_value(time_2, unit, err=err_2):>15s}"
+            f" {ratio:>8s}  "
         )
         split_line = details.split()
-        if len(machine_env_names) > 1:
-            benchmark_name = f"{benchmark} [{mname_1} -> {mname_2}]"
-        else:
+        if no_env_label or len(machine_env_names) <= 1:
             benchmark_name = benchmark
+        elif label_before is not None or label_after is not None:
+            lbl_1 = label_before if label_before is not None else mname_1
+            lbl_2 = label_after if label_after is not None else mname_2
+            benchmark_name = f"{benchmark} [{lbl_1} -> {lbl_2}]"
+        else:
+            benchmark_name = f"{benchmark} [{mname_1} -> {mname_2}]"
         if len(split_line) == 4:
             split_line += [benchmark_name]
         else:
@@ -272,26 +277,13 @@ def do_compare(
 
     log.flush()
 
+    name_1 = ""  # commit_names.get(hash_1)
+    name_2 = ""  # commit_names.get(hash_2)
+
+    sections = []
     for key in keys:
         if len(bench[key]) == 0:
             continue
-
-        if not only_changed:
-            color_print("")
-            color_print(titles[key])
-            color_print("")
-
-        name_1 = False  # commit_names.get(hash_1)
-        if name_1:
-            name_1 = f"<{name_1}>"
-        else:
-            name_1 = ""
-
-        name_2 = False  # commit_names.get(hash_2)
-        if name_2:
-            name_2 = f"<{name_2}>"
-        else:
-            name_2 = ""
 
         if sort == "default":
             pass
@@ -302,8 +294,7 @@ def do_compare(
         else:
             raise ValueError("Unknown 'sort'")
 
-        print(worsened, improved)
-        return tabulate.tabulate(
+        table = tabulate.tabulate(
             bench[key],
             headers=[
                 "Change",
@@ -314,3 +305,12 @@ def do_compare(
             ],
             tablefmt="github",
         )
+
+        if not only_changed:
+            color_print("")
+            color_print(titles[key])
+            color_print("")
+
+        sections.append(table)
+
+    return "\n\n".join(sections), worsened, improved
