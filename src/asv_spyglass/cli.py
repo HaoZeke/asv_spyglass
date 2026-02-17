@@ -1,22 +1,26 @@
+import sys
 from pathlib import Path
 
 import click
 import polars as pl
+import rich_click
 from asv import results
 
 from asv_spyglass._asv_ro import ReadOnlyASVBenchmarks
 from asv_spyglass.compare import ResultPreparer, do_compare
 
+rich_click.rich_click.USE_RICH_MARKUP = True
+rich_click.rich_click.SHOW_ARGUMENTS = True
+rich_click.rich_click.GROUP_ARGUMENTS_OPTIONS = True
 
-@click.group()
+
+@click.group(cls=rich_click.RichGroup)
 def cli():
-    """
-    Command-line interface for ASV benchmark analysis.
-    """
+    """ASV benchmark analysis tool."""
     pass
 
 
-@cli.command()
+@cli.command(cls=rich_click.RichCommand)
 @click.argument("b1", type=click.Path(exists=True), required=True)
 @click.argument("b2", type=click.Path(exists=True), required=True)
 @click.argument("bconf", type=click.Path(exists=True), required=False)
@@ -82,9 +86,7 @@ def compare(
     only_improved,
     only_regressed,
 ):
-    """
-    Compare two ASV result files.
-    """
+    """Compare two ASV result files."""
     if only_improved and only_regressed:
         raise click.UsageError(
             "--only-improved and --only-regressed are mutually exclusive."
@@ -100,8 +102,6 @@ def compare(
                 "automatically. Please provide the "
                 "path to your benchmarks.json file."
             )
-
-    import sys
 
     output, worsened, _ = do_compare(
         b1,
@@ -122,7 +122,7 @@ def compare(
         sys.exit(1)
 
 
-@cli.command()
+@cli.command(cls=rich_click.RichCommand)
 @click.argument("bres", type=click.Path(exists=True), required=True)
 @click.argument("bdat", type=click.Path(exists=True), required=True)
 @click.option(
@@ -131,9 +131,7 @@ def compare(
     help="Save data to csv",
 )
 def to_df(bres, bdat, csv):
-    """
-    Generate a dataframe from an ASV result file.
-    """
+    """Generate a dataframe from an ASV result file."""
     res = results.Results.load(bres)
     benchdat = ReadOnlyASVBenchmarks(Path(bdat)).benchmarks
     preparer = ResultPreparer(benchdat)
