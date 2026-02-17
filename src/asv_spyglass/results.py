@@ -127,9 +127,7 @@ class ASVBench:
     stats_tuple: tuple | None = None
 
     @classmethod
-    def from_prepared_result(
-        cls, name: str, pr: PreparedResult
-    ) -> ASVBench:
+    def from_prepared_result(cls, name: str, pr: PreparedResult) -> ASVBench:
         time = pr.results.get(name, math.nan)
         stats_entry = pr.stats.get(name)
         if stats_entry and stats_entry[0]:

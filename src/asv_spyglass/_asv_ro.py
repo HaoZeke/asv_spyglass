@@ -12,15 +12,8 @@ class ReadOnlyASVBenchmarks:
 
     api_version = 2
 
-    def __init__(self, benchmarks_file: Path, regex: str | list[str] = None):
-        """
-        Initialize and load benchmarks from a JSON file, optionally filtering them.
-
-        Args:
-            benchmarks_file (Path): Path to the benchmarks JSON file.
-            regex (Union[str, list[str]], optional): Regular expression(s) to filter benchmarks.
-                Defaults to None (all benchmarks included).
-        """
+    def __init__(self, benchmarks_file: Path, regex: str | list[str] | None = None):
+        """Load benchmarks from a JSON file, optionally filtering by regex."""
         d = asv_json_load(getstrform(benchmarks_file), api_version=self.api_version)
         self._base_benchmarks = {}  # Store all benchmarks here
         self._benchmark_selection = {}  # Track selected parameter combinations

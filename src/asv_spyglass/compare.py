@@ -129,9 +129,7 @@ def do_compare(
             if _is_result_better(
                 asv1.time, asv2.time, None, None, factor
             ) or _is_result_better(asv2.time, asv1.time, None, None, factor):
-                ratio = Ratio(
-                    t1=asv1.time, t2=asv2.time, is_insignificant=True
-                )
+                ratio = Ratio(t1=asv1.time, t2=asv2.time, is_insignificant=True)
 
         if ratio.is_na:
             ratio_str = "n/a"
