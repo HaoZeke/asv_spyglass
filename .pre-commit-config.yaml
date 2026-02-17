@@ -17,5 +17,5 @@ repos:
     -   id: ruff # isort replacement
         name: ruff-isort
         args: ["--select", "I", "--fix"]
-    - id: ruff-format # Format
-      name: ruff-lint
+    -   id: ruff-format # Format
+        name: ruff-format

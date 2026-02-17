@@ -11,7 +11,6 @@ from asv.commands.compare import (  # type: ignore[import-untyped]
     _isna,
 )
 
-from asv_spyglass._num import Ratio
 from asv_spyglass.results import ASVBench
 
 

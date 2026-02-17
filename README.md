@@ -182,6 +182,24 @@ short names, or `--no-env-label` to suppress it entirely:
 | ...      | ...         | ...         |     ... | ...                                                           |
 ```
 
+### Filtering results
+
+Use `--split` to group output by improvement, unchanged, regression, and
+incomparable sections. Use `--only-changed` to hide unchanged benchmarks.
+
+To see only improvements or only regressions:
+
+``` sh
+# Show only benchmarks that improved
+asv-spyglass compare --only-improved B1 B2 BCONF
+
+# Show only benchmarks that regressed
+asv-spyglass compare --only-regressed B1 B2 BCONF
+```
+
+These two flags are mutually exclusive. The compare command exits with
+code 1 when any regressions are detected, which is useful in CI.
+
 
 # Contributions
 
