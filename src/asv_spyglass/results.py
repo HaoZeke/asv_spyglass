@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import dataclasses
+import math
 import re
 from collections import namedtuple
 
@@ -111,3 +114,36 @@ class PreparedResult:
             data.append(row)
 
         return pl.DataFrame(data)
+
+
+@dataclasses.dataclass(frozen=True)
+class ASVBench:
+    """Single benchmark value extracted from a PreparedResult."""
+
+    time: float
+    err: float | None
+    version: str | None
+    unit: str | None
+    stats_tuple: tuple | None = None
+
+    @classmethod
+    def from_prepared_result(
+        cls, name: str, pr: PreparedResult
+    ) -> ASVBench:
+        time = pr.results.get(name, math.nan)
+        stats_entry = pr.stats.get(name)
+        if stats_entry and stats_entry[0]:
+            from asv_runner.statistics import get_err
+
+            err = get_err(time, stats_entry[0])
+        else:
+            err = None
+        version = pr.versions.get(name)
+        unit = pr.units.get(name)
+        return cls(
+            time=time,
+            err=err,
+            version=version,
+            unit=unit,
+            stats_tuple=stats_entry,
+        )
