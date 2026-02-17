@@ -78,7 +78,7 @@ shape: (16, 17)
 Consider the following situation:
 
 ``` sh
-pixi shell & pdm install -G:all # To start with the right setup for asv_spyglass
+pixi shell & uv pip install -e ".[test]" # To start with the right setup for asv_spyglass
 # Somewhere else..
 gh repo clone airspeed-velocity/asv_samples
 cd asv_samples
@@ -150,6 +150,36 @@ asv-spyglass compare .asv/results/rgx1gen11/*.tmp_1* .asv/results/rgx1gen11/*.tm
 | -        | 324±2ns     | 197±1ns     |    0.61 | benchmarks.time_ranges_multi(10, 'range') [rgx1gen11/existing-py_home_asv_samples_.tmp_1_bin_python -> rgx1gen11/existing-py_home_asv_samples_.tmp_2_bin_python]   |
 |          | 3.25±0.03μs | 3.30±0.03μs |    1.02 | benchmarks.time_ranges_multi(100, 'arange') [rgx1gen11/existing-py_home_asv_samples_.tmp_1_bin_python -> rgx1gen11/existing-py_home_asv_samples_.tmp_2_bin_python] |
 | -        | 729±4ns     | 535±0.8ns   |    0.73 | benchmarks.time_ranges_multi(100, 'range') [rgx1gen11/existing-py_home_asv_samples_.tmp_1_bin_python -> rgx1gen11/existing-py_home_asv_samples_.tmp_2_bin_python]  |
+```
+
+The `[machine/env -> machine/env]` suffix can get very wide with long
+venv paths. Use `--label-before` / `--label-after` to replace it with
+short names, or `--no-env-label` to suppress it entirely:
+
+``` sh
+➜ asv-spyglass compare --label-before py38 --label-after py312 \
+    .asv/results/rgx1gen11/*.tmp_1* \
+    .asv/results/rgx1gen11/*.tmp_2* \
+    .asv/results/benchmarks.json
+
+| Change   | Before      | After       |   Ratio | Benchmark (Parameter)                                                         |
+|----------|-------------|-------------|---------|-------------------------------------------------------------------------------|
+| -        | 157±3ns     | 137±3ns     |    0.87 | benchmarks.TimeSuiteDecoratorSingle.time_keys(10) [py38 -> py312]             |
+| -        | 643±2ns     | 543±2ns     |    0.84 | benchmarks.TimeSuiteDecoratorSingle.time_keys(100) [py38 -> py312]            |
+| ...      | ...         | ...         |     ... | ...                                                                           |
+```
+
+``` sh
+➜ asv-spyglass compare --no-env-label \
+    .asv/results/rgx1gen11/*.tmp_1* \
+    .asv/results/rgx1gen11/*.tmp_2* \
+    .asv/results/benchmarks.json
+
+| Change   | Before      | After       |   Ratio | Benchmark (Parameter)                                         |
+|----------|-------------|-------------|---------|---------------------------------------------------------------|
+| -        | 157±3ns     | 137±3ns     |    0.87 | benchmarks.TimeSuiteDecoratorSingle.time_keys(10)             |
+| -        | 643±2ns     | 543±2ns     |    0.84 | benchmarks.TimeSuiteDecoratorSingle.time_keys(100)            |
+| ...      | ...         | ...         |     ... | ...                                                           |
 ```
 
 
