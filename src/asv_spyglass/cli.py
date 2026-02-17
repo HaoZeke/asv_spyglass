@@ -57,7 +57,20 @@ def compare(b1, b2, bconf, factor, split, only_changed, sort):  # Renamed to 'co
                 "Please provide the path to your benchmarks.json file."
             )
 
-    print(do_compare(b1, b2, bconf, factor, split, only_changed, sort))
+    import sys
+
+    output, worsened, _ = do_compare(
+        b1,
+        b2,
+        bconf,
+        factor,
+        split,
+        only_changed,
+        sort,
+    )
+    print(output)
+    if worsened:
+        sys.exit(1)
 
 
 @cli.command()

@@ -302,15 +302,18 @@ def do_compare(
         else:
             raise ValueError("Unknown 'sort'")
 
-        print(worsened, improved)
-        return tabulate.tabulate(
-            bench[key],
-            headers=[
-                "Change",
-                f"Before {name_1}",
-                f"After {name_2}",
-                "Ratio",
-                "Benchmark (Parameter)",
-            ],
-            tablefmt="github",
+        return (
+            tabulate.tabulate(
+                bench[key],
+                headers=[
+                    "Change",
+                    f"Before {name_1}",
+                    f"After {name_2}",
+                    "Ratio",
+                    "Benchmark (Parameter)",
+                ],
+                tablefmt="github",
+            ),
+            worsened,
+            improved,
         )
