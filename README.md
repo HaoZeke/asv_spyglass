@@ -102,8 +102,14 @@ components:
 ```
 
 `--format json` writes a structured inventory; `--format cyclonedx` emits a
-minimal CycloneDX 1.5-shaped document (planned inventory, not a full
-installed-SBOM claim).
+CycloneDX 1.5-shaped document (planned inventory, not a full installed-SBOM
+claim). By default this uses a built-in lightweight encoder with **no** extra
+dependencies. Install the optional SBOM extra to prefer the real
+`cyclonedx-python-lib` encoder when present:
+
+``` sh
+pip install 'asv-spyglass[sbom]'
+```
 
 Diff two result files (default: library + runtime kinds, changed rows only):
 
@@ -149,6 +155,14 @@ inspection. The benchmark metadata file (`BDAT`) is optional  -  if omitted,
 `asv-spyglass` auto-searches for `benchmarks.json` in the parent directory
 of the result file (the standard `.asv/results/` layout). If still not
 found, results are displayed without extra metadata (units, parameter names).
+
+Write a CSV with `--csv`:
+
+``` sh
+➜ asv-spyglass to-df tests/data/d6b286b8-rattler-py3.12-numpy.json \
+    tests/data/d6b286b8_asv_samples_benchmarks.json \
+    --csv /tmp/result.csv
+```
 
 ``` sh
 # With explicit benchmarks.json
