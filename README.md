@@ -1,9 +1,27 @@
-# About [![Documentation](https://img.shields.io/badge/Documentation-latest-brightgreen?style=for-the-badge)](https://asv.readthedocs.io/projects/asv-spyglass/en/latest/)
+# asv-spyglass
 
-`asv` output file comparer, for comparing across different environments or runs.
+[![Documentation](https://img.shields.io/badge/Documentation-latest-brightgreen?style=for-the-badge)](https://asv.readthedocs.io/projects/asv-spyglass/en/latest/)
+[![PyPI](https://img.shields.io/pypi/v/asv-spyglass.svg)](https://pypi.org/project/asv-spyglass/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-For other functionality, refer to the `asv` package or consider writing an
-extension.
+`asv` result file comparer for timings across environments or runs, plus
+SBOM-style environment inventory diffs. For a published-site GUI with the same
+classify semantics, see [asv-tachyon](https://github.com/HaoZeke/asv_tachyon)
+([docs](https://haozeke.github.io/asv_tachyon/)).
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/HaoZeke/asv_tachyon/main/docs/images/compare.jpg"
+       alt="asv-tachyon Compare view - spyglass-style Before / After / Ratio"
+       width="920" />
+</p>
+
+<p align="center"><em>asv-tachyon Compare - same Before / After / Ratio idea as <code>asv-spyglass compare</code>, over published graphs</em></p>
+
+| Tool | Job |
+|------|-----|
+| **asv-spyglass** | CLI: `compare`, `compare-many`, `to-df`, `inventory`, `env-diff` |
+| **asv-tachyon** | Modern web UI over `asv publish` (Overview · Explore · Compare · Inventory) |
+| **asv-perch** | PR comment tables (CI), built on spyglass |
 
 ## Basic usage
 
@@ -55,13 +73,96 @@ produces a table with multiple ratio columns, similar to `hyperfine`:
 | benchmarks.TimeSuite.time_add_arr | 94.8±30μs                                 | 34.0±0.1μs (-  0.36)             | 28.4±0.2μs (-  0.30)                        |
 ```
 
+### Environment inventory and SBOM-style diffs
+
+ASV result files record the environment surface the run was configured with
+(requirements matrix, Python version, machine attributes). Spyglass can dump
+that as a lock-like inventory, or classify two inventories pairwise
+(`added` / `removed` / `version-bumped` / `unchanged`).
+
+Useful next to `compare` when a timing delta might come from env drift rather
+than the code under test. This is a lightweight planned-inventory approach
+(no full package solver); see also [asv#1447](https://github.com/airspeed-velocity/asv/issues/1447).
+
+Dump one result file:
+
+``` sh
+➜ asv-spyglass inventory tests/data/d6b286b8-virtualenv-py3.12-numpy.json
+machine: rgx1gen11
+env_name: virtualenv-py3.12-numpy
+python: 3.12
+commit: d6b286b8794b81e009e097b7f3f28860861fc563
+source: tests/data/d6b286b8-virtualenv-py3.12-numpy.json
+components:
+  [env] asv.env_name = virtualenv-py3.12-numpy
+  [library] numpy = (unpinned)
+  [machine] machine.arch = x86_64
+  ...
+  [runtime] python = 3.12
+```
+
+`--format json` writes a structured inventory; `--format cyclonedx` emits a
+CycloneDX 1.5-shaped document (planned inventory, not a full installed-SBOM
+claim). By default this uses a built-in lightweight encoder with **no** extra
+dependencies. Install the optional SBOM extra to prefer the real
+`cyclonedx-python-lib` encoder when present:
+
+``` sh
+pip install 'asv-spyglass[sbom]'
+```
+
+Diff two result files (default: library + runtime kinds, changed rows only):
+
+``` sh
+➜ asv-spyglass env-diff \
+    tests/data/a0f29428-virtualenv-py3.12.json \
+    tests/data/a0f29428-virtualenv-py3.12-numpy.json
+
+# Environment inventory diff
+
+Baseline (`rgx1gen11/virtualenv-py3.12`) → contender (`rgx1gen11/virtualenv-py3.12-numpy`).
+
+## Summary
+
+- **unchanged**: 1
+- **added**: 1
+- **removed**: 0
+- **version-bumped**: 0
+
+## Components
+
+| Status | Component | Baseline | Contender | Kind |
+|--------|-----------|----------|-----------|------|
+| added | `numpy` | ` - ` | `(empty)` | library |
+```
+
+Options:
+
+- `--kind library --kind runtime` (default surface); `--all-kinds` also
+  includes machine facts and `asv.env_name`
+- `--include-unchanged` keeps stable packages in the table
+- `--format json` for machine-readable output
+- `--fail-on-change` exits 1 if anything was added, removed, or version-bumped
+  (handy in CI next to a timing gate)
+
+The same classify is available in the [asv-tachyon](https://github.com/HaoZeke/asv_tachyon)
+**Inventory** web view over published graphs or dropped result files.
+
 ### Consuming a single result file
 
 Can be useful for exporting to other dashboards, or internally for further
-inspection. The benchmark metadata file (`BDAT`) is optional — if omitted,
+inspection. The benchmark metadata file (`BDAT`) is optional  -  if omitted,
 `asv-spyglass` auto-searches for `benchmarks.json` in the parent directory
 of the result file (the standard `.asv/results/` layout). If still not
 found, results are displayed without extra metadata (units, parameter names).
+
+Write a CSV with `--csv`:
+
+``` sh
+➜ asv-spyglass to-df tests/data/d6b286b8-rattler-py3.12-numpy.json \
+    tests/data/d6b286b8_asv_samples_benchmarks.json \
+    --csv /tmp/result.csv
+```
 
 ``` sh
 # With explicit benchmarks.json

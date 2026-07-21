@@ -179,6 +179,19 @@ def test_do_compare_many(shared_datadir):
     assert "benchmarks.TimeSuite.time_add_arr" in output
 
 
+def test_do_compare_many_approval(shared_datadir):
+    """Golden master for compare-many multi-column table."""
+    output = do_compare_many(
+        getstrform(shared_datadir / "a0f29428-conda-py3.11-numpy.json"),
+        [
+            getstrform(shared_datadir / "a0f29428-conda-py3.11.json"),
+            getstrform(shared_datadir / "a0f29428-virtualenv-py3.12-numpy.json"),
+        ],
+        shared_datadir / "asv_samples_a0f29428_benchmarks.json",
+    )
+    verify(output)
+
+
 def test_do_compare_many_no_bconf(shared_datadir):
     """compare-many works without benchmarks.json (GH-3)."""
     output = do_compare_many(
@@ -191,3 +204,62 @@ def test_do_compare_many_no_bconf(shared_datadir):
     assert "benchmarks.TimeSuite.time_add_arr" in output
     # Check for formatted float without units
     assert "3.4e-05" in output
+
+
+def test_to_df_csv_export(shared_datadir, tmp_path):
+    """to-df --csv writes a round-trippable Polars CSV."""
+    import polars as pl
+
+    out_csv = tmp_path / "result.csv"
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "to-df",
+            getstrform(shared_datadir / "d6b286b8-rattler-py3.12-numpy.json"),
+            getstrform(shared_datadir / "d6b286b8_asv_samples_benchmarks.json"),
+            "--csv",
+            str(out_csv),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert out_csv.exists()
+    text = out_csv.read_text(encoding="utf-8")
+    assert "benchmark_base" in text
+    assert "name" in text
+    df = pl.read_csv(out_csv)
+    assert df.height == 16
+    assert "benchmark_base" in df.columns
+    assert "result" in df.columns
+    assert df["machine"][0] == "rgx1gen11"
+
+
+def test_joint_benchmark_names_with_empty_prepared():
+    """Empty result maps must not raise Polars SchemaError on concat."""
+    from asv_spyglass.compare import joint_benchmark_names
+    from asv_spyglass.results import PreparedResult
+
+    empty = PreparedResult(
+        units={},
+        results={},
+        stats={},
+        versions={},
+        machine_name="m",
+        env_name="e",
+        param_names={},
+    )
+    full = PreparedResult(
+        units={"bench.a": None},
+        results={"bench.a": 1.0},
+        stats={"bench.a": (None, None)},
+        versions={"bench.a": "1"},
+        machine_name="m",
+        env_name="e",
+        param_names={},
+    )
+    assert joint_benchmark_names() == []
+    assert joint_benchmark_names(empty) == []
+    assert joint_benchmark_names(empty, full) == ["bench.a"]
+    assert joint_benchmark_names(full, empty) == ["bench.a"]
+    # names_frame keeps String schema when empty (safe for Polars concat)
+    assert str(empty.names_frame().schema["name"]) == "String"

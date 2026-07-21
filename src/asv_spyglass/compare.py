@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import polars as pl
 import tabulate
 from asv import results  # type: ignore[import-untyped]
 from asv.commands.compare import (  # type: ignore[import-untyped]
@@ -25,6 +26,28 @@ def human_value_fallback(value, unit, err=None):
     if err:
         return f"{value:.3g}±{err:.1g}"
     return f"{value:.3g}"
+
+
+def _lookup_bench_meta(benchmarks: dict, key: str) -> dict:
+    """Resolve benchmarks.json entry for a result key (exact, then substring)."""
+    if key in benchmarks:
+        return benchmarks[key]
+    for candidate, meta in benchmarks.items():
+        if key in candidate:
+            return meta
+    return {}
+
+
+def joint_benchmark_names(*prepared: PreparedResult) -> list[str]:
+    """Sorted union of result keys across prepared results.
+
+    Uses a set union rather than Polars concat so empty result maps (String vs
+    Null schema) never raise SchemaError.
+    """
+    names: set[str] = set()
+    for pr in prepared:
+        names.update(pr.results.keys())
+    return sorted(names)
 
 
 class ResultPreparer:
@@ -52,18 +75,15 @@ class ResultPreparer:
             env_name,
         ) in result_iter(result_data):
             machine_env_name = f"{machine}/{env_name}"
+            meta = _lookup_bench_meta(self.benchmarks, key)
             for name, value, stats, samples in unroll_result(
                 key, params, value, stats, samples
             ):
                 result_vals[name] = value
                 ss[name] = (stats, samples)
                 versions[name] = version
-                bench_keys = [x for x in self.benchmarks.keys() if key in x]
-                bench_key = bench_keys[0] if bench_keys else key
-                units[name] = self.benchmarks.get(bench_key, {}).get("unit")
-                param_names[name] = self.benchmarks.get(bench_key, {}).get(
-                    "param_names"
-                )
+                units[name] = meta.get("unit")
+                param_names[name] = meta.get("param_names")
 
         if machine_env_name is None:
             raise ValueError("No benchmark results found in the result file")
@@ -116,15 +136,9 @@ def do_compare(
     mname_2 = f"{prepared_2.machine_name}/{prepared_2.env_name}"
     machine_env_names = {mname_1, mname_2}
 
-    joint_benchmarks = sorted(
-        set(prepared_1.results.keys()) | set(prepared_2.results.keys())
-    )
+    joint_benchmarks = joint_benchmark_names(prepared_1, prepared_2)
 
-    if split:
-        bench = {"green": [], "red": [], "lightgrey": [], "default": []}
-    else:
-        bench = {"all": []}
-
+    row_records: list[dict] = []
     worsened = False
     improved = False
 
@@ -184,10 +198,19 @@ def do_compare(
             split_line += [benchmark_name]
         else:
             split_line = [" "] + split_line + [benchmark_name]
-        if split:
-            bench[color].append(split_line)
-        else:
-            bench["all"].append(split_line)
+
+        row_records.append(
+            {
+                "color": color if split else "all",
+                "change": split_line[0],
+                "before": split_line[1],
+                "after": split_line[2],
+                "ratio": split_line[3],
+                "benchmark": split_line[4],
+                "ratio_num": ratio_num,
+                "sort_name": split_line[2],  # match legacy name-sort key
+            }
+        )
 
     if split:
         keys = ["green", "default", "red", "lightgrey"]
@@ -204,22 +227,30 @@ def do_compare(
 
     log.flush()
 
+    if not row_records:
+        return "", worsened, improved
+
+    frame = pl.DataFrame(row_records)
+    if sort == "default":
+        pass
+    elif sort == "ratio":
+        frame = frame.sort("ratio_num", descending=True)
+    elif sort == "name":
+        frame = frame.sort("sort_name")
+    else:
+        raise ValueError("Unknown 'sort'")
+
     sections = []
     for key in keys:
-        if not bench[key]:
+        group = frame.filter(pl.col("color") == key)
+        if group.is_empty():
             continue
 
-        if sort == "default":
-            pass
-        elif sort == "ratio":
-            bench[key].sort(key=lambda v: v[3], reverse=True)
-        elif sort == "name":
-            bench[key].sort(key=lambda v: v[2])
-        else:
-            raise ValueError("Unknown 'sort'")
-
+        table_rows = group.select(
+            ["change", "before", "after", "ratio", "benchmark"]
+        ).rows()
         table = tabulate.tabulate(
-            bench[key],
+            table_rows,
             headers=[
                 "Change",
                 "Before",
@@ -270,23 +301,20 @@ def do_compare_many(
     else:
         display_names = [mname_base] + mnames_contenders
 
-    all_bench_keys = set(prepared_base.results.keys())
-    for p in prepared_contenders:
-        all_bench_keys |= set(p.results.keys())
-    joint_benchmarks = sorted(all_bench_keys)
+    joint_benchmarks = joint_benchmark_names(prepared_base, *prepared_contenders)
 
-    table_data = []
-    unit_base = None
+    records: list[dict] = []
+    contender_cols = [f"contender_{i}" for i in range(len(prepared_contenders))]
 
     for benchmark in joint_benchmarks:
         asv_base = ASVBench.from_prepared_result(benchmark, prepared_base)
-        row = [benchmark]
-
-        # Baseline value
         unit = asv_base.unit
-        row.append(human_value_fallback(asv_base.time, unit, err=asv_base.err))
+        record: dict = {
+            "benchmark": benchmark,
+            "baseline": human_value_fallback(asv_base.time, unit, err=asv_base.err),
+        }
 
-        for p_cont in prepared_contenders:
+        for i, p_cont in enumerate(prepared_contenders):
             asv_cont = ASVBench.from_prepared_result(benchmark, p_cont)
             ratio = Ratio(t1=asv_base.time, t2=asv_cont.time)
 
@@ -315,13 +343,20 @@ def do_compare_many(
             val_str = human_value_fallback(
                 asv_cont.time, asv_cont.unit or unit, err=asv_cont.err
             )
-            row.append(f"{val_str} ({mark}{ratio_str})")
+            record[contender_cols[i]] = f"{val_str} ({mark}{ratio_str})"
 
-        table_data.append(row)
+        records.append(record)
 
+    if not records:
+        return ""
+
+    frame = pl.DataFrame(records)
     if sort == "name":
-        table_data.sort(key=lambda v: v[0])
-    # Default sort is by benchmark name here as well for now
+        frame = frame.sort("benchmark")
+    # Default order follows joint_benchmark_names (sorted by name)
+
+    select_cols = ["benchmark", "baseline", *contender_cols]
+    table_data = frame.select(select_cols).rows()
 
     headers = ["Benchmark", f"Baseline ({display_names[0]})"]
     for name in display_names[1:]:
