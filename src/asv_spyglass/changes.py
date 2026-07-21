@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable
 
 from asv.commands.compare import (  # type: ignore[import-untyped]
     _is_result_better,

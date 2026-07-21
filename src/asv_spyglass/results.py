@@ -6,7 +6,6 @@ import re
 from collections import namedtuple
 
 import polars as pl
-from asv import results  # type: ignore[import-untyped]
 
 ASVResult = namedtuple(
     "ASVResult",
@@ -58,24 +57,18 @@ class PreparedResult:
         for field in dataclasses.fields(self):
             yield getattr(self, field.name)
 
-    def to_df(self):
-        """
-        Converts a PreparedResult object to a DataFrame, exploding the
-        parameters in the keys and flattening the results.
-        """
-
-        data = []
+    def to_df(self) -> pl.DataFrame:
+        """Convert to a Polars DataFrame, exploding params and flattening stats."""
+        data: list[dict] = []
         for key, result in self.results.items():
-            # Extract benchmark name and parameters
             match = re.match(r"(.+)\((.*)\)", key)
             if match:
                 benchmark_name = match.group(1)
-                params = match.group(2).split(", ")
+                params = match.group(2).split(", ") if match.group(2) else []
             else:
                 benchmark_name = key
                 params = []
 
-            # Flatten the results tuple
             stats_dict, samples = self.stats[key]
             if stats_dict is None:
                 stats_dict_maybe_null = {
@@ -97,23 +90,25 @@ class PreparedResult:
                 "machine": self.machine_name,
                 "env": self.env_name,
                 "version": self.versions[key],
-                **stats_dict_maybe_null,  # Expand the stats dictionary
+                **stats_dict_maybe_null,
                 "samples": samples,
             }
-            # Combine param and parameter name for column names
             pnames = self.param_names.get(key)
             if pnames:
                 row.update(
                     dict(
-                        zip(
-                            [f"param_{name}" for name in pnames],
-                            params,
-                        )
+                        zip([f"param_{name}" for name in pnames], params, strict=False)
                     )
                 )
             data.append(row)
 
-        return pl.DataFrame(data)
+        if not data:
+            return pl.DataFrame()
+        return pl.from_dicts(data)
+
+    def names_frame(self) -> pl.DataFrame:
+        """One-column frame of result keys (stable join helper for compare)."""
+        return pl.DataFrame({"name": list(self.results.keys())})
 
 
 @dataclasses.dataclass(frozen=True)

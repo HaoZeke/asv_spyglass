@@ -12,9 +12,9 @@ Independent of benchmark timing compare; use alongside ``do_compare``.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterable
 
 from asv_spyglass.inventory import EnvInventory, inventory_from_result_path
 
