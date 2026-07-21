@@ -64,11 +64,23 @@ def inventory_from_result_path(path: str | Path) -> EnvInventory:
 
 def inventory_from_result(res, source_path: str = "") -> EnvInventory:
     """Build inventory from a loaded ``asv.results.Results`` object."""
-    machine = ""
-    if getattr(res, "params", None):
-        machine = str(res.params.get("machine") or "")
+    # Params mirrors machine facts + often the same requirement names with
+    # resolved versions. Prefer a non-empty params value when the requirement
+    # pin itself is blank (common for unpinned matrix entries like numpy: "").
+    params = getattr(res, "params", None) or {}
+    if not isinstance(params, dict):
+        params = {}
+
+    machine = str(params.get("machine") or "")
     env_name = str(getattr(res, "env_name", "") or "")
-    python = str(getattr(res, "python", "") or res.params.get("python") or "")
+    # asv.results.Results stores the interpreter on private `_python` (no public
+    # property); fall back through params and a future public attr if present.
+    python = str(
+        getattr(res, "_python", None)
+        or getattr(res, "python", None)
+        or params.get("python")
+        or ""
+    )
     commit = str(getattr(res, "commit_hash", "") or "")
 
     components: list[Component] = []
@@ -93,13 +105,6 @@ def inventory_from_result(res, source_path: str = "") -> EnvInventory:
     if reqs is None:
         reqs = getattr(res, "requirements", None)
     reqs = reqs or {}
-
-    # Params mirrors machine facts + often the same requirement names with
-    # resolved versions. Prefer a non-empty params value when the requirement
-    # pin itself is blank (common for unpinned matrix entries like numpy: "").
-    params = getattr(res, "params", None) or {}
-    if not isinstance(params, dict):
-        params = {}
 
     if isinstance(reqs, dict):
         for name, ver in sorted(reqs.items(), key=lambda kv: str(kv[0]).lower()):

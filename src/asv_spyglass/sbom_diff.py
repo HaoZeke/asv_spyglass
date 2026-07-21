@@ -111,12 +111,17 @@ def format_inventory_diff_markdown(
     only_changed: bool = True,
 ) -> str:
     """Human-reviewable markdown (PR-pasteable), eb-stack stack.diff style."""
-    changes = classify_inventory_diff(baseline, solved, kinds=kinds)
-    if only_changed:
-        changes = [c for c in changes if c.kind != ChangeKind.UNCHANGED]
+    # Classify once so one-shot Iterables (generators) are not double-consumed
+    # into an empty summary while the table still has rows.
+    all_changes = classify_inventory_diff(baseline, solved, kinds=kinds)
+    changes = (
+        [c for c in all_changes if c.kind != ChangeKind.UNCHANGED]
+        if only_changed
+        else list(all_changes)
+    )
 
     counts = {k: 0 for k in ChangeKind}
-    for c in classify_inventory_diff(baseline, solved, kinds=kinds):
+    for c in all_changes:
         counts[c.kind] += 1
 
     base_label = (
@@ -173,8 +178,10 @@ def diff_result_files(
     """Convenience: load two result files and format the inventory diff."""
     inv_a = inventory_from_result_path(path_a)
     inv_b = inventory_from_result_path(path_b)
+    # Materialize so generators can be reused for both markdown and the list.
+    kinds_list = None if kinds is None else list(kinds)
     md = format_inventory_diff_markdown(
-        inv_a, inv_b, kinds=kinds, only_changed=only_changed
+        inv_a, inv_b, kinds=kinds_list, only_changed=only_changed
     )
-    changes = classify_inventory_diff(inv_a, inv_b, kinds=kinds)
+    changes = classify_inventory_diff(inv_a, inv_b, kinds=kinds_list)
     return md, changes, inv_a, inv_b

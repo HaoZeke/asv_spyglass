@@ -232,3 +232,34 @@ def test_to_df_csv_export(shared_datadir, tmp_path):
     assert "benchmark_base" in df.columns
     assert "result" in df.columns
     assert df["machine"][0] == "rgx1gen11"
+
+
+def test_joint_benchmark_names_with_empty_prepared():
+    """Empty result maps must not raise Polars SchemaError on concat."""
+    from asv_spyglass.compare import joint_benchmark_names
+    from asv_spyglass.results import PreparedResult
+
+    empty = PreparedResult(
+        units={},
+        results={},
+        stats={},
+        versions={},
+        machine_name="m",
+        env_name="e",
+        param_names={},
+    )
+    full = PreparedResult(
+        units={"bench.a": None},
+        results={"bench.a": 1.0},
+        stats={"bench.a": (None, None)},
+        versions={"bench.a": "1"},
+        machine_name="m",
+        env_name="e",
+        param_names={},
+    )
+    assert joint_benchmark_names() == []
+    assert joint_benchmark_names(empty) == []
+    assert joint_benchmark_names(empty, full) == ["bench.a"]
+    assert joint_benchmark_names(full, empty) == ["bench.a"]
+    # names_frame keeps String schema when empty (safe for Polars concat)
+    assert str(empty.names_frame().schema["name"]) == "String"

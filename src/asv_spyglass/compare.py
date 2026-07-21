@@ -39,13 +39,15 @@ def _lookup_bench_meta(benchmarks: dict, key: str) -> dict:
 
 
 def joint_benchmark_names(*prepared: PreparedResult) -> list[str]:
-    """Sorted union of result keys across prepared results (Polars-backed)."""
-    if not prepared:
-        return []
-    frame = prepared[0].names_frame()
-    for other in prepared[1:]:
-        frame = pl.concat([frame, other.names_frame()])
-    return frame.select("name").unique().sort("name")["name"].to_list()
+    """Sorted union of result keys across prepared results.
+
+    Uses a set union rather than Polars concat so empty result maps (String vs
+    Null schema) never raise SchemaError.
+    """
+    names: set[str] = set()
+    for pr in prepared:
+        names.update(pr.results.keys())
+    return sorted(names)
 
 
 class ResultPreparer:
