@@ -119,8 +119,14 @@ def format_inventory_diff_markdown(
     for c in classify_inventory_diff(baseline, solved, kinds=kinds):
         counts[c.kind] += 1
 
-    base_label = f"{baseline.machine}/{baseline.env_name}" if baseline.machine else baseline.env_name
-    sol_label = f"{solved.machine}/{solved.env_name}" if solved.machine else solved.env_name
+    base_label = (
+        f"{baseline.machine}/{baseline.env_name}"
+        if baseline.machine
+        else baseline.env_name
+    )
+    sol_label = (
+        f"{solved.machine}/{solved.env_name}" if solved.machine else solved.env_name
+    )
 
     lines: list[str] = []
     lines.append("# Environment inventory diff\n")

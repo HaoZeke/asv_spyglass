@@ -134,9 +134,7 @@ def inventory_from_result(res, source_path: str = "") -> EnvInventory:
             )
 
     if env_name:
-        components.append(
-            Component(name="asv.env_name", version=env_name, kind="env")
-        )
+        components.append(Component(name="asv.env_name", version=env_name, kind="env"))
 
     # Stable order
     components = sorted(components, key=lambda c: (c.kind, c.name.lower()))
