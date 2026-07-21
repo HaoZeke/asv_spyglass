@@ -226,3 +226,34 @@ def test_write_synthetic_fixture_under_tests_data(shared_datadir):
     inv = inventory_from_result_path(getstrform(path))
     assert inv.by_name()["numpy"].version == "1.26.0"
     assert inv.by_name()["scipy"].version == "1.11.4"
+
+
+def test_inventory_reads_private_python(shared_datadir):
+    """Prefer Results._python when params omit the interpreter key."""
+    from asv import results
+
+    from asv_spyglass.inventory import inventory_from_result
+
+    res = results.Results.load(
+        getstrform(shared_datadir / "a0f29428-virtualenv-py3.12-numpy.json")
+    )
+    # Drop params python so only the private field remains.
+    res._params = {k: v for k, v in res.params.items() if k != "python"}
+    assert "python" not in res.params
+    inv = inventory_from_result(res)
+    assert inv.python == "3.12"
+    assert inv.by_name()["python"].version == "3.12"
+
+
+def test_format_markdown_kinds_generator_summary(shared_datadir):
+    """One-shot kinds iterables must not zero out the summary counts."""
+    base = inventory_from_result_path(
+        getstrform(shared_datadir / "a0f29428-virtualenv-py3.12.json")
+    )
+    solved = inventory_from_result_path(
+        getstrform(shared_datadir / "a0f29428-virtualenv-py3.12-numpy.json")
+    )
+    kinds = (k for k in ("library", "runtime"))
+    md = format_inventory_diff_markdown(base, solved, kinds=kinds, only_changed=True)
+    assert "**added**: 1" in md
+    assert "`numpy`" in md

@@ -107,8 +107,11 @@ class PreparedResult:
         return pl.from_dicts(data)
 
     def names_frame(self) -> pl.DataFrame:
-        """One-column frame of result keys (stable join helper for compare)."""
-        return pl.DataFrame({"name": list(self.results.keys())})
+        """One-column frame of result keys (String schema even when empty)."""
+        return pl.DataFrame(
+            {"name": list(self.results.keys())},
+            schema={"name": pl.String},
+        )
 
 
 @dataclasses.dataclass(frozen=True)
