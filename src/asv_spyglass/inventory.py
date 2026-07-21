@@ -46,7 +46,7 @@ class EnvInventory:
 def _norm_version(v: Any) -> str:
     if v is None:
         return ""
-    if isinstance(v, (list, tuple)):
+    if isinstance(v, list | tuple):
         # ASV sometimes stores empty-string or version lists
         if not v:
             return ""
@@ -149,16 +149,20 @@ def inventory_from_result(res, source_path: str = "") -> EnvInventory:
     )
 
 
-def inventory_to_cyclonedx(inv: EnvInventory) -> dict[str, Any]:
-    """Minimal CycloneDX 1.5-shaped document (planned inventory, not installed).
+def _component_cdx_type(kind: str) -> str:
+    return "library" if kind == "library" else "file"
 
-    Deliberately lightweight: no cyclonedx-python dependency. Good enough for
-    diff tooling and paste into CI; not a full SBOM compliance claim.
+
+def inventory_to_cyclonedx_lightweight(inv: EnvInventory) -> dict[str, Any]:
+    """Minimal CycloneDX 1.5-shaped document without external SBOM deps.
+
+    Planned inventory only (not an installed-SBOM claim). Default path used
+    when ``cyclonedx-python-lib`` is not installed.
     """
     components = []
     for c in inv.components:
         entry: dict[str, Any] = {
-            "type": "library" if c.kind == "library" else "file",
+            "type": _component_cdx_type(c.kind),
             "name": c.name,
             "version": c.version or "unknown",
         }
@@ -190,6 +194,81 @@ def inventory_to_cyclonedx(inv: EnvInventory) -> dict[str, Any]:
         },
         "components": components,
     }
+
+
+def _inventory_to_cyclonedx_via_lib(inv: EnvInventory) -> dict[str, Any]:
+    """Build CycloneDX 1.5 JSON via ``cyclonedx-python-lib`` (optional extra)."""
+    from cyclonedx.model import Property
+    from cyclonedx.model.bom import Bom
+    from cyclonedx.model.component import Component as CdxComponent
+    from cyclonedx.model.component import ComponentType
+    from cyclonedx.output.json import JsonV1Dot5
+    from packageurl import PackageURL
+
+    type_map = {
+        "library": ComponentType.LIBRARY,
+        "runtime": ComponentType.FILE,
+        "machine": ComponentType.FILE,
+        "env": ComponentType.FILE,
+    }
+
+    bom = Bom()
+    meta_props = [
+        Property(name="asv:machine", value=inv.machine or ""),
+        Property(name="asv:env_name", value=inv.env_name or ""),
+        Property(name="asv:python", value=inv.python or ""),
+        Property(name="asv:commit_hash", value=inv.commit_hash or ""),
+        Property(name="asv:source_path", value=inv.source_path or ""),
+        Property(name="asv:document_kind", value="planned-inventory-from-result"),
+        Property(name="asv:sbom_backend", value="cyclonedx-python-lib"),
+    ]
+    for prop in meta_props:
+        bom.metadata.properties.add(prop)
+    root = CdxComponent(
+        name=inv.env_name or "asv-environment",
+        type=ComponentType.APPLICATION,
+        version=inv.commit_hash[:12] or "unknown",
+    )
+    bom.metadata.component = root
+
+    cdx_components: list[CdxComponent] = []
+    for c in inv.components:
+        cdx_type = type_map.get(c.kind, ComponentType.FILE)
+        purl = None
+        if c.purl:
+            try:
+                purl = PackageURL.from_string(c.purl)
+            except ValueError:
+                purl = None
+        version = c.version or "unknown"
+        cdx_comp = CdxComponent(
+            type=cdx_type,
+            name=c.name,
+            version=version,
+            purl=purl,
+            properties=[Property(name="asv:component_kind", value=c.kind)],
+        )
+        bom.components.add(cdx_comp)
+        cdx_components.append(cdx_comp)
+
+    if cdx_components:
+        bom.register_dependency(root, cdx_components)
+
+    serialized = JsonV1Dot5(bom).output_as_string(indent=2)
+    return json.loads(serialized)
+
+
+def inventory_to_cyclonedx(inv: EnvInventory) -> dict[str, Any]:
+    """CycloneDX 1.5-shaped document (planned inventory, not installed).
+
+    Prefer ``cyclonedx-python-lib`` when installed (``pip install
+    asv_spyglass[sbom]``); otherwise use the built-in lightweight encoder.
+    Output is always a plain dict suitable for ``json.dumps``.
+    """
+    try:
+        return _inventory_to_cyclonedx_via_lib(inv)
+    except ImportError:
+        return inventory_to_cyclonedx_lightweight(inv)
 
 
 def write_inventory_json(inv: EnvInventory, path: str | Path) -> None:
