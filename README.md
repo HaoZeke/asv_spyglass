@@ -71,6 +71,80 @@ shape: (16, 17)
 ```
 
 
+### Environment inventory and SBOM-style diffs
+
+ASV result files record the environment surface the run was configured with
+(requirements matrix, Python version, machine attributes). Spyglass can dump
+that as a lock-like inventory, or classify two inventories pairwise the same
+way [eb-stack](https://github.com/HaoZeke/eb-stack) classifies stack solves
+(`added` / `removed` / `version-bumped` / `unchanged`).
+
+Useful next to `compare` when a timing delta might come from env drift rather
+than the code under test.
+
+Dump one result file:
+
+``` sh
+➜ asv-spyglass inventory tests/data/d6b286b8-virtualenv-py3.12-numpy.json
+machine: rgx1gen11
+env_name: virtualenv-py3.12-numpy
+python: 3.12
+commit: d6b286b8794b81e009e097b7f3f28860861fc563
+source: tests/data/d6b286b8-virtualenv-py3.12-numpy.json
+components:
+  [env] asv.env_name = virtualenv-py3.12-numpy
+  [library] numpy = (unpinned)
+  [machine] machine.arch = x86_64
+  ...
+  [runtime] python = 3.12
+```
+
+`--format json` writes a structured inventory; `--format cyclonedx` emits a
+minimal CycloneDX 1.5-shaped document (planned inventory, not a full
+installed-SBOM claim).
+
+Diff two result files (default: library + runtime kinds, changed rows only):
+
+``` sh
+➜ asv-spyglass env-diff \
+    tests/data/a0f29428-virtualenv-py3.12.json \
+    tests/data/a0f29428-virtualenv-py3.12-numpy.json
+
+# Environment inventory diff
+
+Baseline (`rgx1gen11/virtualenv-py3.12`) → contender (`rgx1gen11/virtualenv-py3.12-numpy`).
+
+Commits: `a0f29428eeb7` → `a0f29428eeb7`.
+
+## Summary
+
+- **unchanged**: 1
+- **added**: 1
+- **removed**: 0
+- **version-bumped**: 0
+
+## Components
+
+| Status | Component | Baseline | Contender | Kind |
+|--------|-----------|----------|-----------|------|
+| added | `numpy` | `—` | `(empty)` | library |
+```
+
+Options:
+
+- `--kind library --kind runtime` (default surface); `--all-kinds` also
+  includes machine facts and `asv.env_name`
+- `--include-unchanged` keeps stable packages in the table
+- `--format json` for machine-readable output
+- `--fail-on-change` exits 1 if anything was added, removed, or version-bumped
+  (handy in CI next to a timing gate)
+
+``` sh
+➜ asv-spyglass env-diff --all-kinds --fail-on-change \
+    tests/data/d6b286b8-virtualenv-py3.12-numpy.json \
+    tests/data/d6b286b8-rattler-py3.12-numpy.json
+```
+
 ## Advanced usage
 
 ### Benchmarking across arbitrary environments
