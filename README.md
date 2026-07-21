@@ -1,9 +1,27 @@
-# About [![Documentation](https://img.shields.io/badge/Documentation-latest-brightgreen?style=for-the-badge)](https://asv.readthedocs.io/projects/asv-spyglass/en/latest/)
+# asv-spyglass
 
-`asv` output file comparer, for comparing across different environments or runs.
+[![Documentation](https://img.shields.io/badge/Documentation-latest-brightgreen?style=for-the-badge)](https://asv.readthedocs.io/projects/asv-spyglass/en/latest/)
+[![PyPI](https://img.shields.io/pypi/v/asv-spyglass.svg)](https://pypi.org/project/asv-spyglass/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-For other functionality, refer to the `asv` package or consider writing an
-extension.
+`asv` result file comparer for timings across environments or runs, plus
+SBOM-style environment inventory diffs. For a published-site GUI with the same
+classify semantics, see [asv-tachyon](https://github.com/HaoZeke/asv_tachyon)
+([docs](https://haozeke.github.io/asv_tachyon/)).
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/HaoZeke/asv_tachyon/main/docs/images/compare.jpg"
+       alt="asv-tachyon Compare view - spyglass-style Before / After / Ratio"
+       width="920" />
+</p>
+
+<p align="center"><em>asv-tachyon Compare - same Before / After / Ratio idea as <code>asv-spyglass compare</code>, over published graphs</em></p>
+
+| Tool | Job |
+|------|-----|
+| **asv-spyglass** | CLI: `compare`, `compare-many`, `to-df`, `inventory`, `env-diff` |
+| **asv-tachyon** | Modern web UI over `asv publish` (Overview · Explore · Compare · Inventory) |
+| **asv-perch** | PR comment tables (CI), built on spyglass |
 
 ## Basic usage
 
