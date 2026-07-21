@@ -1,7 +1,7 @@
 [project]
 name = "asv_spyglass"
 dynamic = ["version"]
-description = "File oriented ASV benchmark comparer"
+description = "File-oriented ASV result comparer with env inventory and SBOM-style diffs"
 authors = [
     {name = "Rohit Goswami", email = "rgoswami@ieee.org"},
 ]
